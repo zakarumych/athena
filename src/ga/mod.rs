@@ -1,0 +1,4 @@
+//! Contains the geometric algebra.
+//! 
+
+
