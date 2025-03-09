@@ -32,14 +32,14 @@ impl<T, const N: usize> Vector<T, N> {
 // Helper macro to implement methods for specific dimensions.
 macro_rules! impl_for_n {
     // Literal dimensions number and identifiers for each dimension.
-    ($n:literal $alias:ident $elements:ident $($r:ident)*) => {
+    ($ty:ident $n:literal $alias:ident $elements:ident [$($r:ident)*] $(where $($clause:tt)+)?) => {
         #[doc = concat!("A ", stringify!($n), "-dimensional vector")]
-        pub type $alias<T = f32> = Vector<T, $n>;
+        pub type $alias<T = f32> = $ty<T, $n>;
 
-        impl<T> Vector<T, $n> {
+        impl<T> $ty<T, $n> $(where $($clause)+)? {
             #[doc = concat!("Create a new vector in ", stringify!($n), "-dimensional space")]
             pub fn new($($r: T),*) -> Self {
-                Vector { e: [$($r,)*] }
+                $ty::from_array([$($r,)*])
             }
 
             const fn elements_layout_matches() -> bool {
@@ -90,7 +90,7 @@ macro_rules! impl_for_n {
             }
         }
 
-        impl<T> Deref for Vector<T, $n> {
+        impl<T> Deref for $ty<T, $n> $(where $($clause)+)? {
             type Target = $elements<T>;
 
             fn deref(&self) -> &$elements<T> {
@@ -98,7 +98,7 @@ macro_rules! impl_for_n {
             }
         }
 
-        impl<T> DerefMut for Vector<T, $n> {
+        impl<T> DerefMut for $ty<T, $n> $(where $($clause)+)? {
             fn deref_mut(&mut self) -> &mut $elements<T> {
                 self.as_elements_mut()
             }
@@ -106,10 +106,10 @@ macro_rules! impl_for_n {
     };
 }
 
-impl_for_n!(1 Vector1 X x);
-impl_for_n!(2 Vector2 XY x y);
-impl_for_n!(3 Vector3 XYZ x y z);
-impl_for_n!(4 Vector4 XYZW x y z w);
+impl_for_n!(Vector 1 Vector1 X [x]);
+impl_for_n!(Vector 2 Vector2 XY [x y]);
+impl_for_n!(Vector 3 Vector3 XYZ [x y z]);
+impl_for_n!(Vector 4 Vector4 XYZW [x y z w]);
 
 /// A vector in N-dimensional space.
 ///
@@ -122,7 +122,19 @@ where
     e: <T as simd::Simd<N>>::Array,
 }
 
-impl_for_n!(1 Vec1 X x);
-impl_for_n!(2 Vec2 XY x y);
-impl_for_n!(3 Vec3 XYZ x y z);
-impl_for_n!(4 Vec4 XYZW x y z w);
+impl<T, const N: usize> Vec<T, N>
+where
+    T: simd::Simd<N>,
+{
+    /// Create a new vector from an array of elements.
+    pub fn from_array(e: [T; N]) -> Self {
+        Vec {
+            e: <T as simd::Simd<N>>::from_array(e),
+        }
+    }
+}
+
+impl_for_n!(Vec 1 Vec1 X [x] where T: simd::Simd<1>);
+impl_for_n!(Vec 2 Vec2 XY [x y] where T: simd::Simd<2>);
+impl_for_n!(Vec 3 Vec3 XYZ [x y z] where T: simd::Simd<3>);
+impl_for_n!(Vec 4 Vec4 XYZW [x y z w] where T: simd::Simd<4>);

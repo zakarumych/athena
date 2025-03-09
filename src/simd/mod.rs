@@ -12,8 +12,10 @@ mod fallback;
 #[cfg(all(target_arch = "aarch64", target_feature = "neon"))]
 pub use self::aarch64::*;
 
-pub trait Simd<const N: usize> {
+pub trait Simd<const N: usize>: Sized {
     type Array;
+
+    fn from_array(elements: [Self; N]) -> Self::Array;
 }
 
 macro_rules! impl_simd {
@@ -22,19 +24,14 @@ macro_rules! impl_simd {
             $(
                 impl Simd<$n> for $ty {
                     type Array = $simd;
+
+                    fn from_array(elements: [Self; $n]) -> Self::Array {
+                        $simd::from_array(elements)
+                    }
                 }
             )+
         )+
     };
-}
-
-trait SimdImpl {
-    type Element;
-    const LEN: usize;
-
-    type Array;
-
-    fn from_array(elements: Self::Array) -> Self;
 }
 
 impl_simd!(
