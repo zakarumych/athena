@@ -1,5 +1,5 @@
 //! Athena is math crate tailored for game engines, rendering and physics simulations.
-//! 
+//!
 
 #![cfg_attr(not(feature = "std"), no_std)]
 #![deny(missing_docs)]
@@ -11,14 +11,10 @@ macro_rules! count {
 }
 
 mod scalar;
+mod simd;
 
-mod vector;
-mod matrix;
 mod ga;
+mod matrix;
+mod vector;
 
-pub use self::{
-    scalar::*,
-    vector::*,
-    matrix::*,
-    ga::*,
-};
+pub use self::{ga::*, matrix::*, scalar::*, vector::*};

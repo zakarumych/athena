@@ -1,7 +1,12 @@
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
 
 /// Scalars are the basic building blocks of the algebraic structures.
-pub trait Scalar: Add + AddAssign + Sub + SubAssign + Mul + MulAssign + Div + DivAssign + Sized {
+///
+/// Note that simd arrays of primitives scalars are also considered scalars,
+/// in which case all operations are performed element-wise.
+pub trait Scalar:
+    Add + AddAssign + Sub + SubAssign + Mul + MulAssign + Div + DivAssign + Sized
+{
     /// The additive identity.
     const ZERO: Self;
 

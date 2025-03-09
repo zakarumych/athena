@@ -1,105 +1,4 @@
-//! Contains vector and operations for them.
-//!
-
-use core::{
-    mem::{align_of, size_of, offset_of}, ops::{Deref, DerefMut},
-};
-
-/// A vector in N-dimensional space.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[repr(transparent)]
-pub struct Vec<T, const N: usize> {
-    e: [T; N],
-}
-
-impl<T, const N: usize> Vec<T, N> {
-    /// Create a new vector from an array of elements.
-    pub fn from_array(e: [T; N]) -> Self {
-        Vec { e }
-    }
-}
-
-// Helper macro to implement methods for specific dimensions.
-macro_rules! impl_for_n {
-    // Literal dimensions number and identifiers for each dimension.
-    ($n:literal $alias:ident $elements:ident $($r:ident)*) => {
-        #[doc = concat!("A ", stringify!($n), "-dimensional vector")]
-        pub type $alias<T = f32> = Vec<T, $n>;
-
-        impl<T> Vec<T, $n> {
-            #[doc = concat!("Create a new vector in ", stringify!($n), "-dimensional space")]
-            pub fn new($($r: T),*) -> Self {
-                Vec { e: [$($r,)*] }
-            }
-
-            const fn elements_layout_matches() -> bool {
-                if size_of::<Self>() != size_of::< $elements<T> >() {
-                    return false;
-                }
-                if align_of::<Self>() != align_of::< $elements<T> >() {
-                    return false;
-                }
-
-                let e = offset_of!(Self, e);
-                let mut idx = 0;
-
-                $(
-                    let r = offset_of!($elements<T>, $r);
-
-                    if r != e + idx * size_of::<T>() {
-                        return false;
-                    }
-                    idx += 1;
-                )*
-
-                idx == $n
-            }
-
-            fn as_elements(&self) -> &$elements<T> {
-                #![allow(unsafe_code)]
-
-                const { assert!(Self::elements_layout_matches()); }
-
-                // This is safe because types have the identical memory layout.
-                unsafe {
-                    let ptr = self as *const Self as *const $elements<T>;
-                    &*ptr
-                }
-            }
-
-            fn as_elements_mut(&mut self) -> &mut $elements<T> {
-                #![allow(unsafe_code)]
-
-                const { assert!(Self::elements_layout_matches()); }
-
-                // This is safe because types have the identical memory layout.
-                unsafe {
-                    let ptr = self as *mut Self as *mut $elements<T>;
-                    &mut *ptr
-                }
-            }
-        }
-
-        impl<T> Deref for Vec<T, $n> {
-            type Target = $elements<T>;
-
-            fn deref(&self) -> &$elements<T> {
-                self.as_elements()
-            }
-        }
-
-        impl<T> DerefMut for Vec<T, $n> {
-            fn deref_mut(&mut self) -> &mut $elements<T> {
-                self.as_elements_mut()
-            }
-        }
-    };
-}
-
-impl_for_n!(1 Vec1 X x);
-impl_for_n!(2 Vec2 XY x y);
-impl_for_n!(3 Vec3 XYZ x y z);
-impl_for_n!(4 Vec4 XYZW x y z w);
+use super::Vector;
 
 /// Type to implement x and y elements access.
 #[repr(C)]
@@ -148,15 +47,15 @@ macro_rules! impl_swizzle {
         {
             $(
                 #[doc = concat!("Returns the ", stringify!($swizzle), " swizzle.")]
-                /// 
+                ///
                 // /// Check swizzle.
-                // /// 
+                // ///
                 // /// ```
                 // #[doc = concat!("assert_eq!(", stringify!($n), ", \"", stringify!($swizzle), "\".len());")]
                 // #[doc = concat!("assert_eq!(\"", $(stringify!($e),)+ "\", \"", stringify!($swizzle), "\");")]
                 // /// ```
-                pub fn $swizzle(&self) -> Vec<T, $n> {
-                    Vec { e: [$(self.$e,)+] }
+                pub fn $swizzle(&self) -> Vector<T, $n> {
+                    Vector { e: [$(self.$e,)+] }
                 }
             )+
         }
@@ -186,7 +85,6 @@ impl_swizzle!(for XY, XYZ, XYZW impl 4
                      xxxy => x x x y, xxyx => x x y x, xxyy => x x y y, xyxx => x y x x, xyxy => x y x y, xyyx => x y y x, xyyy => x y y y,
     yxxx => y x x x, yxxy => y x x y, yxyx => y x y x, yxyy => y x y y, yyxx => y y x x, yyxy => y y x y, yyyx => y y y x, yyyy => y y y y,
 );
-
 
 impl_swizzle!(for XYZ, XYZW impl 1 z => z);
 impl_swizzle!(for XYZ, XYZW impl 2
@@ -235,7 +133,7 @@ impl_swizzle!(for XYZW impl 4
                                                        xzzw => x z z w, xzwx => x z w x, xzwy => x z w y, xzwz => x z w z, xzww => x z w w,
     xwxx => x w x x, xwxy => x w x y, xwxz => x w x z, xwxw => x w x w, xwyx => x w y x, xwyy => x w y y, xwyz => x w y z, xwyw => x w y w,
     xwzx => x w z x, xwzy => x w z y, xwzz => x w z z, xwzw => x w z w, xwwx => x w w x, xwwy => x w w y, xwwz => x w w z, xwww => x w w w,
-    
+
                                                        yxxw => y x x w,                                                    yxyw => y x y w,
                                                        yxzw => y x z w, yxwx => y x w x, yxwy => y x w y, yxwz => y x w z, yxww => y x w w,
                                                        yyxw => y y x w,                                                    yyyw => y y y w,
@@ -244,7 +142,7 @@ impl_swizzle!(for XYZW impl 4
                                                        yzzw => y z z w, yzwx => y z w x, yzwy => y z w y, yzwz => y z w z, yzww => y z w w,
     ywxx => y w x x, ywxy => y w x y, ywxz => y w x z, ywxw => y w x w, ywyx => y w y x, ywyy => y w y y, ywyz => y w y z, ywyw => y w y w,
     ywzx => y w z x, ywzy => y w z y, ywzz => y w z z, ywzw => y w z w, ywwx => y w w x, ywwy => y w w y, ywwz => y w w z, ywww => y w w w,
-    
+
                                                        zxxw => z x x w,                                                    zxyw => z x y w,
                                                        zxzw => z x z w, zxwx => z x w x, zxwy => z x w y, zxwz => z x w z, zxww => z x w w,
                                                        zyxw => z y x w,                                                    zyyw => z y y w,

@@ -5,6 +5,5 @@ edition = "2021"
 description = "Athena is math crate tailored for game engines, rendering and physics simulations"
 license = "MIT OR Apache-2.0"
 
-
 [features]
 std = []
