@@ -80,63 +80,63 @@ impls! {
 }
 
 impl U8x1 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [u8; 1]) -> Self {
         U8x1(elements[0])
     }
 }
 
 impl U8x2 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [u8; 2]) -> Self {
         U8x2(u16::from_ne_bytes(elements))
     }
 }
 
 impl U8x4 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [u8; 4]) -> Self {
         U8x4(u32::from_ne_bytes(elements))
     }
 }
 
 impl U8x8 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [u8; 8]) -> Self {
         U8x8(unsafe { vld1_u8(elements.as_ptr()) })
     }
 }
 
 impl U8x16 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [u8; 16]) -> Self {
         U8x16(unsafe { vld1q_u8(elements.as_ptr()) })
     }
 }
 
 impl U16x1 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [u16; 1]) -> Self {
         Self(elements[0])
     }
 }
 
 impl U16x2 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [u16; 2]) -> Self {
         U16x2(unsafe { core::mem::transmute(elements) })
     }
 }
 
 impl U16x4 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [u16; 4]) -> Self {
         U16x4(unsafe { vld1_u16(elements.as_ptr()) })
     }
 }
 
 impl U16x8 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [u16; 8]) -> Self {
         U16x8(unsafe { vld1q_u16(elements.as_ptr()) })
     }
@@ -151,21 +151,21 @@ impl U16x16 {
 }
 
 impl U32x1 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [u32; 1]) -> Self {
         U32x1(elements[0])
     }
 }
 
 impl U32x2 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [u32; 2]) -> Self {
         U32x2(unsafe { vld1_u32(elements.as_ptr()) })
     }
 }
 
 impl U32x4 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [u32; 4]) -> Self {
         U32x4(unsafe { vld1q_u32(elements.as_ptr()) })
     }
@@ -193,14 +193,14 @@ impl U32x16 {
 }
 
 impl U64x1 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [u64; 1]) -> Self {
         U64x1(unsafe { vld1_u64(elements.as_ptr()) })
     }
 }
 
 impl U64x2 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [u64; 2]) -> Self {
         U64x2(unsafe { vld1q_u64(elements.as_ptr()) })
     }
@@ -245,14 +245,14 @@ impl U64x16 {
 }
 
 impl I8x1 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [i8; 1]) -> Self {
         I8x1(elements[0])
     }
 }
 
 impl I8x2 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [i8; 2]) -> Self {
         let array = [elements[0], elements[1], 0, 0, 0, 0, 0, 0];
         I8x2(unsafe { vld1_s8(array.as_ptr()) })
@@ -260,7 +260,7 @@ impl I8x2 {
 }
 
 impl I8x4 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [i8; 4]) -> Self {
         let array = [
             elements[0],
@@ -277,28 +277,28 @@ impl I8x4 {
 }
 
 impl I8x8 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [i8; 8]) -> Self {
         I8x8(unsafe { vld1_s8(elements.as_ptr()) })
     }
 }
 
 impl I8x16 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [i8; 16]) -> Self {
         I8x16(unsafe { vld1q_s8(elements.as_ptr()) })
     }
 }
 
 impl I16x1 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [i16; 1]) -> Self {
         Self(elements[0])
     }
 }
 
 impl I16x2 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [i16; 2]) -> Self {
         let array = [elements[0], elements[1], 0, 0];
         I16x2(unsafe { vld1_s16(array.as_ptr()) })
@@ -306,14 +306,14 @@ impl I16x2 {
 }
 
 impl I16x4 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [i16; 4]) -> Self {
         I16x4(unsafe { vld1_s16(elements.as_ptr()) })
     }
 }
 
 impl I16x8 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [i16; 8]) -> Self {
         I16x8(unsafe { vld1q_s16(elements.as_ptr()) })
     }
@@ -328,21 +328,21 @@ impl I16x16 {
 }
 
 impl I32x1 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [i32; 1]) -> Self {
         I32x1(elements[0])
     }
 }
 
 impl I32x2 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [i32; 2]) -> Self {
         I32x2(unsafe { vld1_s32(elements.as_ptr()) })
     }
 }
 
 impl I32x4 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [i32; 4]) -> Self {
         I32x4(unsafe { vld1q_s32(elements.as_ptr()) })
     }
@@ -370,14 +370,14 @@ impl I32x16 {
 }
 
 impl I64x1 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [i64; 1]) -> Self {
         I64x1(unsafe { vld1_s64(elements.as_ptr()) })
     }
 }
 
 impl I64x2 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [i64; 2]) -> Self {
         I64x2(unsafe { vld1q_s64(elements.as_ptr()) })
     }
@@ -422,21 +422,21 @@ impl I64x16 {
 }
 
 impl F32x1 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [f32; 1]) -> Self {
         F32x1(elements[0])
     }
 }
 
 impl F32x2 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [f32; 2]) -> Self {
         F32x2(unsafe { vld1_f32(elements.as_ptr()) })
     }
 }
 
 impl F32x4 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [f32; 4]) -> Self {
         F32x4(unsafe { vld1q_f32(elements.as_ptr()) })
     }
@@ -464,14 +464,14 @@ impl F32x16 {
 }
 
 impl F64x1 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [f64; 1]) -> Self {
         F64x1(unsafe { vld1_f64(elements.as_ptr()) })
     }
 }
 
 impl F64x2 {
-    #[inline]
+    #[inline(always)]
     pub fn from_array(elements: [f64; 2]) -> Self {
         F64x2(unsafe { vld1q_f64(elements.as_ptr()) })
     }

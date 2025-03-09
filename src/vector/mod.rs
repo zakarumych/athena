@@ -24,6 +24,7 @@ pub struct Vector<T, const N: usize> {
 
 impl<T, const N: usize> Vector<T, N> {
     /// Create a new vector from an array of elements.
+    #[inline(always)]
     pub fn from_array(e: [T; N]) -> Self {
         Vector { e }
     }
@@ -38,6 +39,7 @@ macro_rules! impl_for_n {
 
         impl<T> $ty<T, $n> $(where $($clause)+)? {
             #[doc = concat!("Create a new vector in ", stringify!($n), "-dimensional space")]
+            #[inline(always)]
             pub fn new($($r: T),*) -> Self {
                 $ty::from_array([$($r,)*])
             }
@@ -65,6 +67,7 @@ macro_rules! impl_for_n {
                 idx == $n
             }
 
+            #[inline]
             fn as_elements(&self) -> &$elements<T> {
                 #![allow(unsafe_code)]
 
@@ -77,6 +80,7 @@ macro_rules! impl_for_n {
                 }
             }
 
+            #[inline]
             fn as_elements_mut(&mut self) -> &mut $elements<T> {
                 #![allow(unsafe_code)]
 
@@ -93,12 +97,14 @@ macro_rules! impl_for_n {
         impl<T> Deref for $ty<T, $n> $(where $($clause)+)? {
             type Target = $elements<T>;
 
+            #[inline(always)]
             fn deref(&self) -> &$elements<T> {
                 self.as_elements()
             }
         }
 
         impl<T> DerefMut for $ty<T, $n> $(where $($clause)+)? {
+            #[inline(always)]
             fn deref_mut(&mut self) -> &mut $elements<T> {
                 self.as_elements_mut()
             }
@@ -127,6 +133,7 @@ where
     T: simd::Simd<N>,
 {
     /// Create a new vector from an array of elements.
+    #[inline(always)]
     pub fn from_array(e: [T; N]) -> Self {
         Vec {
             e: <T as simd::Simd<N>>::from_array(e),

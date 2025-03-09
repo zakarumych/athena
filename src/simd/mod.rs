@@ -25,6 +25,7 @@ macro_rules! impl_simd {
                 impl Simd<$n> for $ty {
                     type Array = $simd;
 
+                    #[inline(always)]
                     fn from_array(elements: [Self; $n]) -> Self::Array {
                         $simd::from_array(elements)
                     }
