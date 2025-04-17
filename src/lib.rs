@@ -11,7 +11,7 @@ macro_rules! count {
 }
 
 mod scalar;
-mod simd;
+// mod simd;
 
 mod ga;
 mod matrix;

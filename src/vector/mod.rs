@@ -9,8 +9,6 @@ use core::{
     ops::{Deref, DerefMut},
 };
 
-use crate::simd;
-
 pub use self::elements::{X, XY, XYZ, XYZW};
 
 mod elements;
@@ -116,32 +114,3 @@ impl_for_n!(Vector 1 Vector1 X [x]);
 impl_for_n!(Vector 2 Vector2 XY [x y]);
 impl_for_n!(Vector 3 Vector3 XYZ [x y z]);
 impl_for_n!(Vector 4 Vector4 XYZW [x y z w]);
-
-/// A vector in N-dimensional space.
-///
-/// It is limited version of `Vector` that is optimized for SIMD operations.
-#[repr(transparent)]
-pub struct Vec<T, const N: usize>
-where
-    T: simd::Simd<N>,
-{
-    e: <T as simd::Simd<N>>::Array,
-}
-
-impl<T, const N: usize> Vec<T, N>
-where
-    T: simd::Simd<N>,
-{
-    /// Create a new vector from an array of elements.
-    #[inline(always)]
-    pub fn from_array(e: [T; N]) -> Self {
-        Vec {
-            e: <T as simd::Simd<N>>::from_array(e),
-        }
-    }
-}
-
-impl_for_n!(Vec 1 Vec1 X [x] where T: simd::Simd<1>);
-impl_for_n!(Vec 2 Vec2 XY [x y] where T: simd::Simd<2>);
-impl_for_n!(Vec 3 Vec3 XYZ [x y z] where T: simd::Simd<3>);
-impl_for_n!(Vec 4 Vec4 XYZW [x y z w] where T: simd::Simd<4>);
