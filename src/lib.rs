@@ -13,8 +13,8 @@ macro_rules! count {
 mod scalar;
 // mod simd;
 
-mod ga;
 mod matrix;
+mod pga;
 mod vector;
 
-pub use self::{ga::*, matrix::*, scalar::*, vector::*};
+pub use self::{matrix::*, pga::*, scalar::*, vector::*};

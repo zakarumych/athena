@@ -1,4 +1,4 @@
-use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 
 /// Scalars are the basic building blocks of the algebraic structures.
 ///
@@ -13,6 +13,7 @@ pub trait Scalar:
     + MulAssign
     + Div<Output = Self>
     + DivAssign
+    + Neg<Output = Self>
     + Copy
 {
     /// The additive identity.
