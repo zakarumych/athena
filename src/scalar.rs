@@ -14,6 +14,8 @@ pub trait Scalar:
     + Div<Output = Self>
     + DivAssign
     + Neg<Output = Self>
+    + PartialEq
+    + PartialOrd
     + Copy
 {
     /// The additive identity.
