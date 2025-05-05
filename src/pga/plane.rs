@@ -1,19 +1,27 @@
-use crate::Scalar;
+use crate::Num;
 
 use super::elements::Vector3;
-
 
 /// Plane is fundamental object in 3d projective geometric algebra.
 /// All other objects are produced by combining planes.
 ///
 /// Plane3's dual is a Point3
+#[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(C)]
 pub struct Plane3<T>(Vector3<T>);
 
 impl<T> Plane3<T>
 where
-    T: Scalar,
+    T: Num,
 {
+    pub(super) const fn vector(&self) -> Vector3<T> {
+        self.0
+    }
+
+    pub(super) const fn from_vector(vector: Vector3<T>) -> Self {
+        Plane3(vector)
+    }
+
     /// A vanishing plane.
     /// Also known as the plane at infinity.
     pub const INFINITY: Self = Plane3(Vector3 {

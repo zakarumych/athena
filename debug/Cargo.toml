@@ -1,0 +1,12 @@
+[package]
+name = "debug"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+athena = { path = ".." }
+eframe = "0.31"
+egui = { version = "0.31" }
+egui-snarl = { git = "https://github.com/zakarumych/egui-snarl" }
+rand = "0.9.1"
