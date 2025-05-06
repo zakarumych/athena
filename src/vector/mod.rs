@@ -23,8 +23,44 @@ pub struct Vector<T, const N: usize> {
 impl<T, const N: usize> Vector<T, N> {
     /// Create a new vector from an array of elements.
     #[inline(always)]
-    pub fn from_array(e: [T; N]) -> Self {
+    pub const fn from_array(e: [T; N]) -> Self {
         Vector { e }
+    }
+
+    /// Interpret array reference as a vector reference.
+    #[inline(always)]
+    pub const fn from_array_ref(e: &[T; N]) -> &Self {
+        #![allow(unsafe_code)]
+
+        unsafe {
+            // This is safe because the memory layout of the vector and the array are identical.
+            let ptr = e as *const [T; N] as *const Self;
+            &*ptr
+        }
+    }
+
+    /// Interpret mutable array reference as a vector reference.
+    #[inline(always)]
+    pub const fn from_array_mut(e: &mut [T; N]) -> &mut Self {
+        #![allow(unsafe_code)]
+
+        unsafe {
+            // This is safe because the memory layout of the vector and the array are identical.
+            let ptr = e as *mut [T; N] as *mut Self;
+            &mut *ptr
+        }
+    }
+
+    /// Extracts the elements of the vector as an array.
+    #[inline(always)]
+    pub const fn array(&self) -> &[T; N] {
+        &self.e
+    }
+
+    /// Extracts the elements of the vector as an array.
+    #[inline(always)]
+    pub fn into_array(self) -> [T; N] {
+        self.e
     }
 }
 
@@ -38,7 +74,7 @@ macro_rules! impl_for_n {
         impl<T> $ty<T, $n> $(where $($clause)+)? {
             #[doc = concat!("Create a new vector in ", stringify!($n), "-dimensional space")]
             #[inline(always)]
-            pub fn new($($r: T),*) -> Self {
+            pub const fn new($($r: T),*) -> Self {
                 $ty::from_array([$($r,)*])
             }
 

@@ -1,10 +1,8 @@
-use core::ops::Mul;
-
 use crate::Num;
 
 use super::{
     elements::{BiVector3, Vector2},
-    Motor2, Point2,
+    Point2,
 };
 
 /// Plane is fundamental object in 2d projective geometric algebra.

@@ -1,10 +1,8 @@
-use core::ops::Mul;
-
 use crate::Num;
 
 use super::{
-    elements::{regressive, BiVector2, Dual, TriVector3},
-    Line2, Motor2,
+    elements::{regressive, BiVector2, TriVector3},
+    Line2,
 };
 
 /// Two dimensional point
