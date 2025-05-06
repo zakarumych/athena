@@ -145,14 +145,14 @@ impl<T, const N: usize> Matrix<T, N, 1> {
     }
 }
 
-impl<T, const N: usize, const M: usize, const K: usize> Mul<Matrix<T, K, M>> for Matrix<T, N, K>
+impl<T, const N: usize, const M: usize, const K: usize> Mul<&Matrix<T, K, M>> for &Matrix<T, N, K>
 where
     T: Num,
 {
     type Output = Matrix<T, N, M>;
 
     #[inline]
-    fn mul(self, rhs: Matrix<T, K, M>) -> Self::Output {
+    fn mul(self, rhs: &Matrix<T, K, M>) -> Self::Output {
         let mut result = Matrix::<T, N, M> {
             e: [[T::ZERO; M]; N],
         };
@@ -169,6 +169,52 @@ where
     }
 }
 
+impl<T, const N: usize, const M: usize, const K: usize> Mul<Matrix<T, K, M>> for &Matrix<T, N, K>
+where
+    T: Num,
+{
+    type Output = Matrix<T, N, M>;
+
+    #[inline(always)]
+    fn mul(self, rhs: Matrix<T, K, M>) -> Self::Output {
+        self.mul(&rhs)
+    }
+}
+
+impl<T, const N: usize, const M: usize, const K: usize> Mul<&Matrix<T, K, M>> for Matrix<T, N, K>
+where
+    T: Num,
+{
+    type Output = Matrix<T, N, M>;
+
+    #[inline(always)]
+    fn mul(self, rhs: &Matrix<T, K, M>) -> Self::Output {
+        (&self).mul(rhs)
+    }
+}
+
+impl<T, const N: usize, const M: usize, const K: usize> Mul<Matrix<T, K, M>> for Matrix<T, N, K>
+where
+    T: Num,
+{
+    type Output = Matrix<T, N, M>;
+
+    #[inline(always)]
+    fn mul(self, rhs: Matrix<T, K, M>) -> Self::Output {
+        (&self).mul(&rhs)
+    }
+}
+
+impl<T, const N: usize> MulAssign<&Matrix<T, N>> for Matrix<T, N>
+where
+    T: Num,
+{
+    #[inline(always)]
+    fn mul_assign(&mut self, rhs: &Matrix<T, N>) {
+        *self = self.mul(rhs);
+    }
+}
+
 impl<T, const N: usize> MulAssign<Matrix<T, N>> for Matrix<T, N>
 where
     T: Num,
@@ -178,3 +224,175 @@ where
         *self = self.mul(rhs);
     }
 }
+
+impl<T, const N: usize, const M: usize> Mul<&Vector<T, N>> for &Matrix<T, N, M>
+where
+    T: Num,
+{
+    type Output = Vector<T, M>;
+
+    #[inline]
+    fn mul(self, rhs: &Vector<T, N>) -> Vector<T, M> {
+        let mut result = Vector::<T, M>::ZERO;
+
+        for n in 0..N {
+            for m in 0..M {
+                result[m] += self.e[n][m] * rhs[n];
+            }
+        }
+
+        result
+    }
+}
+
+impl<T, const N: usize, const M: usize> Mul<Vector<T, N>> for &Matrix<T, N, M>
+where
+    T: Num,
+{
+    type Output = Vector<T, M>;
+
+    #[inline(always)]
+    fn mul(self, rhs: Vector<T, N>) -> Vector<T, M> {
+        self.mul(&rhs)
+    }
+}
+
+impl<T, const N: usize, const M: usize> Mul<&Vector<T, N>> for Matrix<T, N, M>
+where
+    T: Num,
+{
+    type Output = Vector<T, M>;
+
+    #[inline(always)]
+    fn mul(self, rhs: &Vector<T, N>) -> Vector<T, M> {
+        (&self).mul(rhs)
+    }
+}
+
+impl<T, const N: usize, const M: usize> Mul<Vector<T, N>> for Matrix<T, N, M>
+where
+    T: Num,
+{
+    type Output = Vector<T, M>;
+
+    #[inline(always)]
+    fn mul(self, rhs: Vector<T, N>) -> Vector<T, M> {
+        (&self).mul(&rhs)
+    }
+}
+
+impl<T, const N: usize, const M: usize> Mul<&Matrix<T, N, M>> for &Vector<T, M>
+where
+    T: Num,
+{
+    type Output = Vector<T, N>;
+
+    #[inline(always)]
+    fn mul(self, rhs: &Matrix<T, N, M>) -> Vector<T, N> {
+        let mut result = Vector::<T, N>::ZERO;
+
+        for n in 0..N {
+            for m in 0..M {
+                result[n] += rhs.e[n][m] * self[m];
+            }
+        }
+
+        result
+    }
+}
+
+impl<T, const N: usize, const M: usize> Mul<Matrix<T, N, M>> for &Vector<T, M>
+where
+    T: Num,
+{
+    type Output = Vector<T, N>;
+
+    #[inline(always)]
+    fn mul(self, rhs: Matrix<T, N, M>) -> Vector<T, N> {
+        self.mul(&rhs)
+    }
+}
+
+impl<T, const N: usize, const M: usize> Mul<&Matrix<T, N, M>> for Vector<T, M>
+where
+    T: Num,
+{
+    type Output = Vector<T, N>;
+
+    #[inline(always)]
+    fn mul(self, rhs: &Matrix<T, N, M>) -> Vector<T, N> {
+        (&self).mul(rhs)
+    }
+}
+
+impl<T, const N: usize, const M: usize> Mul<Matrix<T, N, M>> for Vector<T, M>
+where
+    T: Num,
+{
+    type Output = Vector<T, N>;
+
+    #[inline(always)]
+    fn mul(self, rhs: Matrix<T, N, M>) -> Vector<T, N> {
+        (&self).mul(&rhs)
+    }
+}
+
+/// Matrix with 1 column and 1 row.
+pub type Matrix1x1<T> = Matrix<T, 1, 1>;
+
+/// Matrix with 1 column and 2 rows.
+pub type Matrix1x2<T> = Matrix<T, 1, 2>;
+
+/// Matrix with 1 column and 3 rows.
+pub type Matrix1x3<T> = Matrix<T, 1, 3>;
+
+/// Matrix with 1 column and 4 rows.
+pub type Matrix1x4<T> = Matrix<T, 1, 4>;
+
+/// Matrix with 2 columns and 1 row.
+pub type Matrix2x1<T> = Matrix<T, 2, 1>;
+
+/// Matrix with 2 columns and 2 rows.
+pub type Matrix2x2<T> = Matrix<T, 2, 2>;
+
+/// Matrix with 2 columns and 3 rows.
+pub type Matrix2x3<T> = Matrix<T, 2, 3>;
+
+/// Matrix with 2 columns and 4 rows.
+pub type Matrix2x4<T> = Matrix<T, 2, 4>;
+
+/// Matrix with 3 columns and 1 row.
+pub type Matrix3x1<T> = Matrix<T, 3, 1>;
+
+/// Matrix with 3 columns and 2 rows.
+pub type Matrix3x2<T> = Matrix<T, 3, 2>;
+
+/// Matrix with 3 columns and 3 rows.
+pub type Matrix3x3<T> = Matrix<T, 3, 3>;
+
+/// Matrix with 3 columns and 4 rows.
+pub type Matrix3x4<T> = Matrix<T, 3, 4>;
+
+/// Matrix with 4 columns and 1 row.
+pub type Matrix4x1<T> = Matrix<T, 4, 1>;
+
+/// Matrix with 4 columns and 2 rows.
+pub type Matrix4x2<T> = Matrix<T, 4, 2>;
+
+/// Matrix with 4 columns and 3 rows.
+pub type Matrix4x3<T> = Matrix<T, 4, 3>;
+
+/// Matrix with 4 columns and 4 rows.
+pub type Matrix4x4<T> = Matrix<T, 4, 4>;
+
+/// Matrix with 1 column and 1 row.
+pub type Matrix1<T> = Matrix<T, 1>;
+
+/// Matrix with 2 columns and 2 rows.
+pub type Matrix2<T> = Matrix<T, 2>;
+
+/// Matrix with 3 columns and 3 rows.
+pub type Matrix3<T> = Matrix<T, 3>;
+
+/// Matrix with 4 columns and 4 rows.
+pub type Matrix4<T> = Matrix<T, 4>;

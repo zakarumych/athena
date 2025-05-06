@@ -6,8 +6,10 @@
 
 use core::{
     mem::{align_of, offset_of, size_of},
-    ops::{Deref, DerefMut},
+    ops::{Deref, DerefMut, Index, IndexMut},
 };
+
+use crate::Num;
 
 pub use self::elements::{X, XY, XYZ, XYZW};
 
@@ -64,6 +66,32 @@ impl<T, const N: usize> Vector<T, N> {
     }
 }
 
+impl<T, const N: usize> Vector<T, N>
+where
+    T: Num,
+{
+    /// Create a new vector with all elements set to zero.
+    pub const ZERO: Self = Vector { e: [T::ZERO; N] };
+}
+
+impl<T, const N: usize> Index<usize> for Vector<T, N> {
+    type Output = T;
+
+    #[inline(always)]
+    fn index(&self, index: usize) -> &T {
+        assert!(index < N, "Index out of bounds: {}", index);
+        &self.e[index]
+    }
+}
+
+impl<T, const N: usize> IndexMut<usize> for Vector<T, N> {
+    #[inline(always)]
+    fn index_mut(&mut self, index: usize) -> &mut T {
+        assert!(index < N, "Index out of bounds: {}", index);
+        &mut self.e[index]
+    }
+}
+
 // Helper macro to implement methods for specific dimensions.
 macro_rules! impl_for_n {
     // Literal dimensions number and identifiers for each dimension.
@@ -78,12 +106,12 @@ macro_rules! impl_for_n {
                 $ty::from_array([$($r,)*])
             }
 
-            const fn elements_layout_matches() -> bool {
-                if size_of::<Self>() <= size_of::< $elements<T> >() {
-                    return false;
+            const fn elements_layout_matches() {
+                if size_of::<Self>() < size_of::< $elements<T> >() {
+                    panic!(concat!("Size of ", stringify!($ty)," is less than or equal to size of ", stringify!($elements)));
                 }
-                if align_of::<Self>() >= align_of::< $elements<T> >() {
-                    return false;
+                if align_of::<Self>() > align_of::< $elements<T> >() {
+                    panic!(concat!("Alignment of ", stringify!($ty)," is greater than or equal to alignment of ", stringify!($elements)));
                 }
 
                 let e = offset_of!(Self, e);
@@ -93,19 +121,21 @@ macro_rules! impl_for_n {
                     let r = offset_of!($elements<T>, $r);
 
                     if r != e + idx * size_of::<T>() {
-                        return false;
+                        panic!(concat!("Offset of ", stringify!($r), " in ", stringify!($elements), " does not match offset of ", stringify!($ty), " at index ", stringify!($n)));
                     }
                     idx += 1;
                 )*
 
-                idx == $n
+                if idx != $n {
+                    panic!(concat!("Number of elements in ", stringify!($elements), " does not match number of elements in ", stringify!($ty)));
+                }
             }
 
             #[inline]
             fn as_elements(&self) -> &$elements<T> {
                 #![allow(unsafe_code)]
 
-                const { assert!(Self::elements_layout_matches()); }
+                const { Self::elements_layout_matches(); }
 
                 // This is safe because types have the identical memory layout.
                 unsafe {
@@ -118,7 +148,7 @@ macro_rules! impl_for_n {
             fn as_elements_mut(&mut self) -> &mut $elements<T> {
                 #![allow(unsafe_code)]
 
-                const { assert!(Self::elements_layout_matches()); }
+                const { Self::elements_layout_matches(); }
 
                 // This is safe because types have the identical memory layout.
                 unsafe {

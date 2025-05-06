@@ -1,5 +1,9 @@
+use athena::{Matrix, Matrix4, Vector2, Vector4};
 use eframe::egui;
-use egui::{DragValue, Rect, Sense, Vec2, emath::RectTransform, global_theme_preference_buttons};
+use egui::{
+    Color32, DragValue, Rect, Sense, Shape, Vec2, emath::RectTransform,
+    global_theme_preference_buttons,
+};
 use egui_snarl::Snarl;
 use nodes::{Node, Renderable, show_nodes};
 
@@ -78,22 +82,77 @@ impl eframe::App for AthenaVisualize {
             let size = ui.available_size();
             let (rect, _response) = ui.allocate_exact_size(size, Sense::empty());
 
+            let camera = camera(size.x / size.y, 70.0_f32.to_radians());
+
             let painter = ui.painter_at(rect);
+
+            let rect_transform = RectTransform::from_to(
+                Rect::from_min_max(egui::pos2(-1.0, -1.0), egui::pos2(1.0, 1.0)),
+                rect,
+            );
+
+            for i in -10..=10 {
+                let from = Vector4::new((i as f32) * 0.1, -1.0, 0.0, 1.0);
+                let to = Vector4::new((i as f32) * 0.1, 1.0, 0.0, 1.0);
+
+                let from2 = camera * from;
+                let to2 = camera * to;
+
+                let from3 =
+                    rect_transform.transform_pos(egui::pos2(from2.x / from2.w, from2.y / from2.w));
+                let to3 = rect_transform.transform_pos(egui::pos2(to2.x / to2.w, to2.y / to2.w));
+
+                painter.add(Shape::line_segment(
+                    [from3, to3],
+                    (1.0, Color32::from_rgba_premultiplied(100, 100, 100, 100)),
+                ));
+            }
+
+            for i in -10..=10 {
+                let from = Vector4::new(-1.0, (i as f32) * 0.1, 0.0, 1.0);
+                let to = Vector4::new(1.0, (i as f32) * 0.1, 0.0, 1.0);
+
+                let from2 = camera * from;
+                let to2 = camera * to;
+
+                let from3 =
+                    rect_transform.transform_pos(egui::pos2(from2.x / from2.w, from2.y / from2.w));
+                let to3 = rect_transform.transform_pos(egui::pos2(to2.x / to2.w, to2.y / to2.w));
+
+                painter.add(Shape::line_segment(
+                    [from3, to3],
+                    (1.0, Color32::from_rgba_premultiplied(100, 100, 100, 100)),
+                ));
+            }
 
             let ar = rect.aspect_ratio();
 
             for renderable in &self.show {
-                renderable.draw(
-                    &painter,
-                    RectTransform::from_to(
-                        Rect::from_min_max(
-                            egui::pos2(-self.view_scale * ar, -self.view_scale) + self.view_offset,
-                            egui::pos2(self.view_scale * ar, self.view_scale) + self.view_offset,
-                        ),
-                        rect,
-                    ),
-                );
+                renderable.draw(&painter, &camera, rect_transform);
             }
         });
     }
+}
+
+fn camera(aspect: f32, fov: f32) -> Matrix4<f32> {
+    let near = 0.1;
+    let far = 100.0;
+
+    let f = 1.0 / (fov / 2.0).tan();
+
+    let perspective = Matrix4::from_column_arrays([
+        [f / aspect, 0.0, 0.0, 0.0],
+        [0.0, f, 0.0, 0.0],
+        [0.0, 0.0, far / (far - near), 1.0],
+        [0.0, 0.0, -far * near / (far - near), 0.0],
+    ]);
+
+    let translate = Matrix4::from_column_arrays([
+        [1.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 1.0, 0.0],
+        [0.0, 1.0, 0.0, 0.0],
+        [0.0, 0.5, 2.0, 1.0],
+    ]);
+
+    translate * perspective
 }

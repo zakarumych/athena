@@ -14,6 +14,8 @@ enum Type {
     Point2,
     Line2,
     Motor2,
+    Point3,
+    Line3,
 }
 
 impl Type {
@@ -24,6 +26,8 @@ impl Type {
             Type::Point2 => "Point2",
             Type::Line2 => "Line2",
             Type::Motor2 => "Motor2",
+            Type::Point3 => "Point3",
+            Type::Line3 => "Line3",
         }
     }
 }
@@ -36,6 +40,8 @@ impl Type {
             Type::Point2 => Color32::RED,
             Type::Line2 => Color32::GREEN,
             Type::Motor2 => Color32::BLUE,
+            Type::Point3 => Color32::YELLOW,
+            Type::Line3 => Color32::PURPLE,
         }
     }
 }
@@ -48,6 +54,8 @@ pub enum Value {
     Point2(Point2<f32>),
     Line2(Line2<f32>),
     Motor2(Motor2<f32>),
+    Point3(Point3<f32>),
+    Line3(Line3<f32>),
 }
 
 impl Value {
@@ -58,6 +66,8 @@ impl Value {
             Value::Point2(_) => Type::Point2,
             Value::Line2(_) => Type::Line2,
             Value::Motor2(_) => Type::Motor2,
+            Value::Point3(_) => Type::Point3,
+            Value::Line3(_) => Type::Line3,
         }
     }
 
@@ -84,10 +94,28 @@ impl Value {
             Value::Motor2 { .. } => {
                 ui.label("Motor2");
             }
+            Value::Point3(point) if point.is_ideal() => {
+                let (x, y, z) = point.coords();
+                ui.label(format!("Point3 at infinity: ({}, {}, {})", x, y, z));
+            }
+            Value::Point3(point) => {
+                let (x, y, z) = point.coords();
+                ui.label(format!("Point3: ({}, {}, {})", x, y, z));
+            }
+            Value::Line3(line) => {
+                ui.label("Line3");
+            }
         }
     }
 
-    pub fn draw(&self, scale: f32, color: Color32, painter: &Painter, tr: RectTransform) {
+    pub fn draw(
+        &self,
+        scale: f32,
+        color: Color32,
+        painter: &Painter,
+        camera: &Matrix4<f32>,
+        tr: RectTransform,
+    ) {
         match self {
             Value::Nil => {}
             Value::Scalar(_) => {}
@@ -143,6 +171,17 @@ impl Value {
             }
             Value::Motor2 { .. } => {
                 todo!()
+            }
+            Value::Point3(point) => {
+                if point.is_ideal() {
+                    return;
+                }
+
+                let (x, y, z) = point.coords();
+                let v = *camera * Vector4::new(x, y, z, 1.0);
+                let pos = egui::pos2(v.x / v.w, v.y / v.w);
+                let pos = tr.transform_pos(pos);
+                painter.add(Shape::circle_filled(pos, scale, color));
             }
         }
     }
@@ -219,6 +258,9 @@ enum CtorNode {
         b: [Point2<f32>; 2],
         motor: Motor2<f32>,
     },
+    Point3 {
+        point: Point3<f32>,
+    },
 }
 
 impl CtorNode {
@@ -230,6 +272,7 @@ impl CtorNode {
             CtorNode::PointPointMotor2 { .. } => "Point to Point Motor2",
             CtorNode::LineLineMotor2 { .. } => "Line to Line Motor2",
             CtorNode::ReconstructMotor2 { .. } => "Reconstruct Motor2",
+            CtorNode::Point3 { .. } => "Point3",
         }
     }
 
@@ -247,6 +290,7 @@ impl CtorNode {
                 Type::Point2,
                 Type::Point2,
             ],
+            CtorNode::Point3 { .. } => &[Type::Scalar, Type::Scalar, Type::Scalar],
         }
     }
 
@@ -258,6 +302,7 @@ impl CtorNode {
             CtorNode::PointPointMotor2 { .. } => Type::Motor2,
             CtorNode::LineLineMotor2 { .. } => Type::Motor2,
             CtorNode::ReconstructMotor2 { .. } => Type::Motor2,
+            CtorNode::Point3 { .. } => Type::Point3,
         }
     }
 
@@ -448,6 +493,49 @@ impl CtorNode {
                     _ => unreachable!(),
                 };
             }
+            CtorNode::Point3 { point } => {
+                let (mut x, mut y, mut z) = point.coords();
+
+                match idx {
+                    0 => match value {
+                        Some(Value::Scalar(scalar)) => {
+                            x = scalar;
+                            ui.add(DragValue::new(&mut x).speed(0.0));
+                        }
+                        _ => {
+                            let s = x.abs().max(1.0) * 0.001;
+                            ui.add(DragValue::new(&mut x).speed(s));
+                        }
+                    },
+                    1 => match value {
+                        Some(Value::Scalar(scalar)) => {
+                            y = scalar;
+                            ui.add(DragValue::new(&mut y).speed(0.0));
+                        }
+                        _ => {
+                            let s = y.abs().max(1.0) * 0.001;
+                            ui.add(DragValue::new(&mut y).speed(s));
+                        }
+                    },
+                    2 => match value {
+                        Some(Value::Scalar(scalar)) => {
+                            z = scalar;
+                            ui.add(DragValue::new(&mut z).speed(0.0));
+                        }
+                        _ => {
+                            let s = z.abs().max(1.0) * 0.001;
+                            ui.add(DragValue::new(&mut z).speed(s));
+                        }
+                    },
+                    _ => unreachable!(),
+                };
+
+                if point.is_ideal() {
+                    *point = Point3::ideal(x, y, z);
+                } else {
+                    *point = Point3::at(x, y, z);
+                }
+            }
         }
     }
 
@@ -471,6 +559,9 @@ impl CtorNode {
             CtorNode::ReconstructMotor2 { motor, .. } => {
                 Value::Motor2(*motor).show(ui);
             }
+            CtorNode::Point3 { point } => {
+                Value::Point3(*point).show(ui);
+            }
         }
     }
 
@@ -482,6 +573,7 @@ impl CtorNode {
             CtorNode::PointPointMotor2 { motor, .. } => Value::Motor2(*motor),
             CtorNode::LineLineMotor2 { motor, .. } => Value::Motor2(*motor),
             CtorNode::ReconstructMotor2 { motor, .. } => Value::Motor2(*motor),
+            CtorNode::Point3 { point } => Value::Point3(*point),
         }
     }
 }
@@ -715,8 +807,8 @@ pub struct Renderable {
 }
 
 impl Renderable {
-    pub fn draw(&self, painter: &Painter, tr: RectTransform) {
-        self.value.draw(self.scale, self.color, painter, tr);
+    pub fn draw(&self, painter: &Painter, camera: &Matrix4<f32>, tr: RectTransform) {
+        self.value.draw(self.scale, self.color, painter, camera, tr);
     }
 }
 
@@ -1037,6 +1129,15 @@ impl SnarlViewer<Node> for AthenaViewer {
                         pos,
                         Node::CtorNode(CtorNode::Point2 {
                             point: Point2::ORIGIN,
+                        }),
+                    );
+                    ui.close_menu();
+                }
+                if ui.button("Point3").clicked() {
+                    snarl.insert_node(
+                        pos,
+                        Node::CtorNode(CtorNode::Point3 {
+                            point: Point3::ORIGIN,
                         }),
                     );
                     ui.close_menu();
