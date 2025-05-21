@@ -1,6 +1,6 @@
 use crate::{Matrix, Vector};
 
-struct InPlaceSeed<'a, T: 'a>(pub &'a mut T);
+struct InPlaceSeed<'a, T: 'a>(&'a mut T);
 
 impl<'a, 'de, T> serde::de::DeserializeSeed<'de> for InPlaceSeed<'a, T>
 where
@@ -8,6 +8,7 @@ where
 {
     type Value = ();
 
+    #[inline]
     fn deserialize<D>(self, deserializer: D) -> Result<(), D::Error>
     where
         D: serde::de::Deserializer<'de>,
@@ -16,7 +17,7 @@ where
     }
 }
 
-struct SliceInPlaceSeed<'a, T: 'a>(pub &'a mut [T]);
+struct SliceInPlaceSeed<'a, T: 'a>(&'a mut [T]);
 
 impl<'a, 'de, T> serde::de::DeserializeSeed<'de> for SliceInPlaceSeed<'a, T>
 where
@@ -24,6 +25,7 @@ where
 {
     type Value = ();
 
+    #[inline]
     fn deserialize<D>(self, deserializer: D) -> Result<(), D::Error>
     where
         D: serde::de::Deserializer<'de>,
@@ -37,6 +39,7 @@ struct ArrayVisitor<T, const N: usize> {
 }
 
 impl<T, const N: usize> ArrayVisitor<T, N> {
+    #[inline]
     fn new() -> Self {
         ArrayVisitor {
             marker: core::marker::PhantomData,
@@ -113,7 +116,12 @@ where
     type Value = ();
 
     fn expecting(&self, formatter: &mut core::fmt::Formatter) -> core::fmt::Result {
-        write!(formatter, "an array of length {}", N)
+        write!(
+            formatter,
+            "an array of length {} of arrays of length {}",
+            self.0.len(),
+            N
+        )
     }
 
     #[inline]
@@ -143,6 +151,7 @@ impl<T, const N: usize> serde::Serialize for Vector<T, N>
 where
     T: serde::Serialize,
 {
+    #[inline]
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
@@ -155,6 +164,7 @@ impl<'de, T, const N: usize> serde::de::Deserialize<'de> for Vector<T, N>
 where
     T: serde::de::Deserialize<'de>,
 {
+    #[inline]
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::de::Deserializer<'de>,
@@ -165,6 +175,7 @@ where
         }
     }
 
+    #[inline]
     fn deserialize_in_place<D>(deserializer: D, place: &mut Self) -> Result<(), D::Error>
     where
         D: serde::de::Deserializer<'de>,
@@ -177,6 +188,7 @@ impl<T, const N: usize, const M: usize> serde::Serialize for Matrix<T, N, M>
 where
     T: serde::Serialize,
 {
+    #[inline]
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::Serializer,
@@ -192,6 +204,7 @@ impl<'de, T, const N: usize, const M: usize> serde::de::Deserialize<'de> for Mat
 where
     T: serde::de::Deserialize<'de>,
 {
+    #[inline]
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::de::Deserializer<'de>,
@@ -200,6 +213,7 @@ where
         Ok(Matrix::from_column_arrays(vectors.map(Vector::into_array)))
     }
 
+    #[inline]
     fn deserialize_in_place<D>(deserializer: D, place: &mut Self) -> Result<(), D::Error>
     where
         D: serde::de::Deserializer<'de>,
