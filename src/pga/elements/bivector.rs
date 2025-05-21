@@ -753,6 +753,30 @@ where
         e31: T::ZERO,
         e23: T::ZERO,
     };
+
+    pub fn norm2(&self) -> T {
+        self.e12 * self.e12 + self.e31 * self.e31 + self.e23 * self.e23
+    }
+
+    pub fn norm(&self) -> T {
+        self.norm2().sqrt()
+    }
+
+    pub fn normalize(&mut self) {
+        let norm2 = self.norm2();
+        if norm2 != T::ZERO {
+            let norm = norm2.sqrt();
+            self.e12 /= norm;
+            self.e31 /= norm;
+            self.e23 /= norm;
+        }
+    }
+
+    pub fn normalized(&self) -> Self {
+        let mut bivector = *self;
+        bivector.normalize();
+        bivector
+    }
 }
 
 impl<T> Neg for EBiVector3<T>
@@ -1243,6 +1267,38 @@ pub struct BiVector3<T> {
     pub e23: T,
 }
 
+impl<T> From<XBiVector3<T>> for BiVector3<T>
+where
+    T: Num,
+{
+    fn from(x: XBiVector3<T>) -> Self {
+        BiVector3 {
+            e01: x.e01,
+            e02: x.e02,
+            e03: x.e03,
+            e12: T::ZERO,
+            e31: T::ZERO,
+            e23: T::ZERO,
+        }
+    }
+}
+
+impl<T> From<EBiVector3<T>> for BiVector3<T>
+where
+    T: Num,
+{
+    fn from(x: EBiVector3<T>) -> Self {
+        BiVector3 {
+            e01: T::ZERO,
+            e02: T::ZERO,
+            e03: T::ZERO,
+            e12: x.e12,
+            e31: x.e31,
+            e23: x.e23,
+        }
+    }
+}
+
 impl<T> BiVector3<T> {
     pub const fn new(e01: T, e02: T, e03: T, e12: T, e31: T, e23: T) -> Self {
         BiVector3 {
@@ -1268,6 +1324,33 @@ where
         e31: T::ZERO,
         e23: T::ZERO,
     };
+
+    pub fn norm2(&self) -> T {
+        self.e12 * self.e12 + self.e31 * self.e31 + self.e23 * self.e23
+    }
+
+    pub fn norm(&self) -> T {
+        self.norm2().sqrt()
+    }
+
+    pub fn normalize(&mut self) {
+        let norm2 = self.norm2();
+        if norm2 != T::ZERO {
+            let norm = norm2.sqrt();
+            self.e01 /= norm;
+            self.e02 /= norm;
+            self.e03 /= norm;
+            self.e12 /= norm;
+            self.e31 /= norm;
+            self.e23 /= norm;
+        }
+    }
+
+    pub fn normalized(&self) -> Self {
+        let mut bivector = *self;
+        bivector.normalize();
+        bivector
+    }
 }
 
 impl<T> Neg for BiVector3<T>

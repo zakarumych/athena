@@ -6,7 +6,7 @@ mod scalar;
 mod trivector;
 mod vector;
 
-use core::ops::{BitAnd, BitXor};
+use core::ops::BitXor;
 
 pub(crate) use self::{bivector::*, pseudo::*, scalar::*, trivector::*, vector::*};
 
@@ -27,4 +27,16 @@ where
     <T::Output as BitXor<U::Output>>::Output: Dual<Output = R>,
 {
     (lhs.dual() ^ rhs.dual()).dual()
+}
+
+pub fn regressive3<T, U, Y, R>(a: T, b: U, c: Y) -> R
+where
+    T: Dual,
+    U: Dual,
+    Y: Dual,
+    T::Output: BitXor<U::Output>,
+    <T::Output as BitXor<U::Output>>::Output: BitXor<Y::Output>,
+    <<T::Output as BitXor<U::Output>>::Output as BitXor<Y::Output>>::Output: Dual<Output = R>,
+{
+    (a.dual() ^ b.dual() ^ c.dual()).dual()
 }

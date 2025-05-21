@@ -382,6 +382,31 @@ where
         e2: T::ZERO,
         e3: T::ZERO,
     };
+
+    pub fn norm2(&self) -> T {
+        self.e1 * self.e1 + self.e2 * self.e2 + self.e3 * self.e3
+    }
+
+    pub fn norm(&self) -> T {
+        self.norm2().sqrt()
+    }
+
+    pub fn normalize(&mut self) {
+        let norm2 = self.norm2();
+        if norm2 != T::ZERO {
+            let norm = norm2.sqrt();
+            self.e0 /= norm;
+            self.e1 /= norm;
+            self.e2 /= norm;
+            self.e3 /= norm;
+        }
+    }
+
+    pub fn normalized(&self) -> Self {
+        let mut vector = *self;
+        vector.normalize();
+        vector
+    }
 }
 
 impl<T> Neg for Vector3<T>

@@ -1,8 +1,8 @@
 use crate::Num;
 
 use super::{
-    elements::{regressive, BiVector2, TriVector3},
-    Line2,
+    elements::{regressive, regressive3, BiVector2, TriVector3},
+    Line2, Line3, Plane3,
 };
 
 /// Two dimensional point
@@ -89,7 +89,7 @@ where
     pub fn reflect_point(&self, point: Point2<T>) -> Point2<T> {
         let (s, bv) = self.bivector() * point.bivector();
 
-        let a = (!self.bivector()) * s;
+        let a = s * !self.bivector();
         let (_zero, b) = bv * !self.bivector();
 
         Point2::from_bivector(a + b)
@@ -183,28 +183,69 @@ where
         self.0.e123 == T::ZERO
     }
 
+    /// Returns norm of the point.
+    pub fn norm(&self) -> T {
+        self.0.norm()
+    }
+
     /// Normalizes the point.
     ///
     /// Does not affect points at infinity.
     pub fn normalize(&mut self) {
-        let norm = self.0.e123;
-        if norm != T::ZERO {
-            self.0.e032 /= norm;
-            self.0.e013 /= norm;
-            self.0.e021 /= norm;
-            self.0.e123 = T::ONE;
-        }
+        self.0.normalize();
     }
 
     /// Returns same point, but normalized.
     pub fn normalized(&self) -> Self {
-        let mut point = *self;
-        point.normalize();
-        point
+        Point3(self.0.normalized())
     }
 
     /// Returns the coordinates of the point.
     pub const fn coords(&self) -> (T, T, T) {
         (self.0.e032, self.0.e013, self.0.e021)
+    }
+
+    /// Make this line act as a reflector.
+    ///
+    /// Reflects a point.
+    pub fn reflect_point(&self, point: Point3<T>) -> Point3<T> {
+        let (s, bv) = self.trivector() * point.trivector();
+
+        let a = s * !self.trivector();
+        let b = bv * !self.trivector();
+
+        Point3::from_trivector(a + b)
+    }
+
+    /// Make this line act as a reflector.
+    ///
+    /// Reflects a line.
+    pub fn reflect_line(&self, line: Line3<T>) -> Line3<T> {
+        let (v, tv) = self.trivector() * line.bivector();
+
+        let (a, _zero) = v * !self.trivector();
+        let (_zero, b) = tv * !self.trivector();
+
+        Line3::from_bivector(a + b)
+    }
+
+    /// Find the line through two points.
+    pub fn join(&self, other: Point3<T>) -> Line3<T> {
+        Line3::from_bivector(regressive(self.trivector(), other.trivector()))
+    }
+
+    /// Find the plane through three points.
+    pub fn join3(&self, other: Point3<T>, another: Point3<T>) -> Plane3<T> {
+        Plane3::from_vector(regressive3(
+            self.trivector(),
+            other.trivector(),
+            another.trivector(),
+        ))
+    }
+
+    /// Find orthogonal projection of this point to the line.
+    pub fn project_to(&self, line: Line3<T>) -> Point3<T> {
+        let (_zero, tv) = !line.bivector() * (self.trivector() | line.bivector());
+        Point3::from_trivector(tv)
     }
 }

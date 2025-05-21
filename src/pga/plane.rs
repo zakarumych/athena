@@ -59,4 +59,24 @@ where
     pub const fn new(e0: T, e1: T, e2: T, e3: T) -> Self {
         Plane3(Vector3 { e0, e1, e2, e3 })
     }
+
+    /// Returns norm of the line.
+    pub fn norm(&self) -> T {
+        self.0.norm()
+    }
+
+    /// Returns squared norm of the line.
+    pub fn norm2(&self) -> T {
+        self.0.norm2()
+    }
+
+    /// Normalizes the line.
+    pub fn normalize(&mut self) {
+        self.0.normalize();
+    }
+
+    /// Returns a normalized line.
+    pub fn normalized(&self) -> Self {
+        Plane3(self.0.normalized())
+    }
 }

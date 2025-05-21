@@ -1,8 +1,8 @@
 use crate::Num;
 
 use super::{
-    elements::{BiVector3, Vector2},
-    Point2,
+    elements::{regressive, BiVector3, Vector2},
+    Plane3, Point2, Point3,
 };
 
 /// Plane is fundamental object in 2d projective geometric algebra.
@@ -133,6 +133,18 @@ impl<T> Line3<T>
 where
     T: Num,
 {
+    /// A vanishing horizontal line.
+    ///
+    /// This assumes Y is up and Z is forward.
+    pub const HORIZON: Self = Line3(BiVector3::new(
+        T::ZERO,
+        T::ZERO,
+        T::ZERO,
+        T::ZERO,
+        T::ONE,
+        T::ZERO,
+    ));
+
     pub(super) const fn bivector(&self) -> BiVector3<T> {
         self.0
     }
@@ -146,15 +158,29 @@ where
         Line3(BiVector3::new(e01, e02, e03, e12, e31, e23))
     }
 
-    /// A vanishing horizontal line.
-    ///
-    /// This assumes Y is up and Z is forward.
-    pub const HORIZON: Self = Line3(BiVector3::new(
-        T::ZERO,
-        T::ZERO,
-        T::ZERO,
-        T::ZERO,
-        T::ONE,
-        T::ZERO,
-    ));
+    /// Returns norm of the line.
+    pub fn norm(&self) -> T {
+        self.0.norm()
+    }
+
+    /// Returns squared norm of the line.
+    pub fn norm2(&self) -> T {
+        self.0.norm2()
+    }
+
+    /// Normalizes the line.
+    pub fn normalize(&mut self) {
+        self.0.normalize();
+    }
+
+    /// Returns a normalized line.
+    pub fn normalized(&self) -> Self {
+        Line3(self.0.normalized())
+    }
+
+    /// Find the plane that contains this line and the given point.
+    pub fn join(&self, other: Point3<T>) -> Plane3<T> {
+        let r = regressive(self.bivector(), other.trivector());
+        Plane3::from_vector(r)
+    }
 }

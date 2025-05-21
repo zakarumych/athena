@@ -19,6 +19,13 @@ impl<T> Pseudo2<T> {
     }
 }
 
+impl<T> Pseudo2<T>
+where
+    T: Num,
+{
+    pub const ZERO: Self = Self { e012: T::ZERO };
+}
+
 impl<T> Neg for Pseudo2<T>
 where
     T: Num,
@@ -125,15 +132,15 @@ where
     }
 }
 
-impl<T> BitOr<T> for Pseudo2<T>
+impl<T> BitOr<Scalar2<T>> for Pseudo2<T>
 where
     T: Num,
 {
     type Output = Pseudo2<T>;
 
-    fn bitor(self, other: T) -> Pseudo2<T> {
+    fn bitor(self, other: Scalar2<T>) -> Pseudo2<T> {
         Pseudo2 {
-            e012: self.e012 * other,
+            e012: self.e012 * other.0,
         }
     }
 }
@@ -252,6 +259,13 @@ impl<T> Pseudo3<T> {
     pub const fn new(e0123: T) -> Self {
         Self { e0123 }
     }
+}
+
+impl<T> Pseudo3<T>
+where
+    T: Num,
+{
+    pub const ZERO: Self = Self { e0123: T::ZERO };
 }
 
 impl<T> Neg for Pseudo3<T>

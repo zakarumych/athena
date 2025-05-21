@@ -24,6 +24,42 @@ impl<T> TriVector3<T> {
     }
 }
 
+impl<T> TriVector3<T>
+where
+    T: Num,
+{
+    pub const ZERO: Self = TriVector3 {
+        e021: T::ZERO,
+        e013: T::ZERO,
+        e032: T::ZERO,
+        e123: T::ZERO,
+    };
+
+    pub fn norm2(&self) -> T {
+        self.e123 * self.e123
+    }
+
+    pub fn norm(&self) -> T {
+        self.e123.abs()
+    }
+
+    pub fn normalize(&mut self) {
+        let norm = self.norm();
+        if norm != T::ZERO {
+            self.e021 /= norm;
+            self.e013 /= norm;
+            self.e032 /= norm;
+            self.e123 /= norm;
+        }
+    }
+
+    pub fn normalized(&self) -> Self {
+        let mut trivector = *self;
+        trivector.normalize();
+        trivector
+    }
+}
+
 impl<T> Neg for TriVector3<T>
 where
     T: Num,

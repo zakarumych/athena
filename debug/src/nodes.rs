@@ -183,26 +183,28 @@ impl Value {
                 let pos = tr.transform_pos(pos);
                 painter.add(Shape::circle_filled(pos, scale, color));
             }
+            Value::Line3(_) => {
+                todo!()
+            }
         }
     }
 
     fn apply(&self, geom: &Value) -> Value {
         match (self, geom) {
             (Value::Nil, _) => Value::Nil,
-            (Value::Line2(transform), Value::Point2(point)) => {
-                Value::Point2(transform.reflect_point(*point))
+            (Value::Point2(mirror), Value::Point2(point)) => {
+                Value::Point2(mirror.reflect_point(*point))
             }
-            (Value::Line2(transform), Value::Line2(line)) => {
-                Value::Line2(transform.reflect_line(*line))
+            (Value::Point2(mirror), Value::Line2(line)) => Value::Line2(mirror.reflect_line(*line)),
+            (Value::Line2(mirror), Value::Point2(point)) => {
+                Value::Point2(mirror.reflect_point(*point))
             }
-            (Value::Point2(transform), Value::Point2(point)) => {
-                Value::Point2(transform.reflect_point(*point))
-            }
-            (Value::Point2(transform), Value::Line2(line)) => {
-                Value::Line2(transform.reflect_line(*line))
-            }
+            (Value::Line2(mirror), Value::Line2(line)) => Value::Line2(mirror.reflect_line(*line)),
             (Value::Motor2(motor), Value::Point2(point)) => Value::Point2(motor.move_point(*point)),
             (Value::Motor2(motor), Value::Line2(line)) => Value::Line2(motor.move_line(*line)),
+            (Value::Point3(transform), Value::Point3(point)) => {
+                Value::Point3(transform.reflect_point(*point))
+            }
             _ => Value::Nil,
         }
     }
@@ -580,6 +582,7 @@ impl CtorNode {
 
 enum Motor {
     Motor2(Motor2<f32>),
+    Motor3(Motor3<f32>),
 }
 
 impl Motor {
@@ -595,6 +598,12 @@ impl Motor {
         match self {
             Motor::Motor2(motor) => match geom {
                 Value::Point2(point) => Value::Point2(motor.move_point(point)),
+                Value::Line2(line) => Value::Line2(motor.move_line(line)),
+                _ => unreachable!(),
+            },
+            Motor::Motor3(motor) => match geom {
+                Value::Point3(point) => Value::Point3(motor.move_point(point)),
+                Value::Line3(line) => Value::Line3(motor.move_line(line)),
                 _ => unreachable!(),
             },
         }
