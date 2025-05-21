@@ -5,7 +5,7 @@
 //!
 
 use core::{
-    mem::{align_of, offset_of, size_of},
+    mem::{align_of, offset_of, size_of, MaybeUninit},
     ops::{Deref, DerefMut, Index, IndexMut},
 };
 
@@ -18,8 +18,6 @@ mod elements;
 /// A vector in N-dimensional space.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(transparent)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "serde", serde(transparent))]
 pub struct Vector<T, const N: usize> {
     e: [T; N],
 }
@@ -59,6 +57,12 @@ impl<T, const N: usize> Vector<T, N> {
     #[inline(always)]
     pub const fn array(&self) -> &[T; N] {
         &self.e
+    }
+
+    /// Extracts the elements of the vector as an array.
+    #[inline(always)]
+    pub const fn array_mut(&mut self) -> &mut [T; N] {
+        &mut self.e
     }
 
     /// Extracts the elements of the vector as an array.

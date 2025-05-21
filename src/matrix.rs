@@ -12,8 +12,6 @@ use crate::{Num, Vector};
 /// `N` is the number of columns = row size.
 /// `M` is the number of rows = column size.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "serde", serde(transparent))]
 pub struct Matrix<T, const N: usize, const M: usize = N> {
     e: [[T; M]; N],
 }
@@ -111,6 +109,16 @@ impl<T, const N: usize, const M: usize> Matrix<T, N, M> {
         }
 
         Some(Vector::from_array_mut(&mut self.e[n]))
+    }
+
+    /// Returns reference to the matrix elements as arrays.
+    pub const fn arrays(&self) -> &[[T; M]; N] {
+        &self.e
+    }
+
+    /// Returns mutable reference to the matrix elements as arrays.
+    pub const fn arrays_mut(&mut self) -> &mut [[T; M]; N] {
+        &mut self.e
     }
 }
 

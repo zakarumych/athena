@@ -18,3 +18,9 @@ mod pga;
 mod vector;
 
 pub use self::{matrix::*, pga::*, scalar::*, vector::*};
+
+#[cfg(feature = "serde")]
+mod array_init;
+
+#[cfg(feature = "serde")]
+mod serde;
