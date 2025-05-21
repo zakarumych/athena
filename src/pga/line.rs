@@ -9,6 +9,8 @@ use super::{
 /// All other objects are produced by combining planes.
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 pub struct Line2<T>(Vector2<T>);
 
 impl<T> Line2<T>
@@ -127,6 +129,8 @@ where
 /// Line in 3D is an intersection of two planes.
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 pub struct Line3<T>(BiVector3<T>);
 
 impl<T> Line3<T>

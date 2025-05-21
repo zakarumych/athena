@@ -9,6 +9,8 @@ use super::{
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(transparent)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 pub struct Scalar2<T>(pub T);
 
 impl<T> Scalar2<T> {
@@ -310,6 +312,8 @@ where
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(transparent)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 pub struct Scalar3<T>(pub T);
 
 impl<T> Scalar3<T> {

@@ -359,6 +359,9 @@ dependencies = [
 [[package]]
 name = "athena"
 version = "0.0.0"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "atomic-waker"

@@ -18,6 +18,8 @@ mod elements;
 /// A vector in N-dimensional space.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(transparent)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 pub struct Vector<T, const N: usize> {
     e: [T; N],
 }

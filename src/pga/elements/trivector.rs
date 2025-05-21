@@ -6,6 +6,7 @@ use super::{scalar::Scalar3, BiVector3, Dual, EBiVector3, Pseudo3, Vector3, XBiV
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct TriVector3<T> {
     pub e021: T,
     pub e013: T,

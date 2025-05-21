@@ -8,6 +8,7 @@ use super::elements::Vector3;
 /// Plane3's dual is a Point3
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Plane3<T>(Vector3<T>);
 
 impl<T> Plane3<T>

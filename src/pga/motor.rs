@@ -10,6 +10,7 @@ use super::{
 /// Motor is a 2D rotation and translation operator.
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Motor2<T> {
     scalar: Scalar2<T>,
     bivector: BiVector2<T>,
@@ -221,6 +222,7 @@ where
 /// Motor is a 2D rotation and translation operator.
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Motor3<T> {
     scalar: Scalar3<T>,
     bivector: BiVector3<T>,

@@ -9,6 +9,7 @@ use super::{
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Vector2<T> {
     pub e0: T,
     pub e1: T,
@@ -359,6 +360,7 @@ where
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Vector3<T> {
     pub e0: T,
     pub e1: T,

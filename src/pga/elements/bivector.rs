@@ -9,6 +9,7 @@ use super::{
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct BiVector2<T> {
     pub e01: T,
     pub e20: T,
@@ -349,6 +350,7 @@ where
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct XBiVector3<T> {
     pub e01: T,
     pub e02: T,
@@ -732,6 +734,7 @@ where
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct EBiVector3<T> {
     pub e12: T,
     pub e31: T,
@@ -1258,6 +1261,7 @@ where
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(C)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct BiVector3<T> {
     pub e01: T,
     pub e02: T,

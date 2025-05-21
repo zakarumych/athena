@@ -12,6 +12,8 @@ use crate::{Num, Vector};
 /// `N` is the number of columns = row size.
 /// `M` is the number of rows = column size.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 pub struct Matrix<T, const N: usize, const M: usize = N> {
     e: [[T; M]; N],
 }

@@ -8,6 +8,8 @@ use super::{
 /// Two dimensional point
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(transparent)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 pub struct Point2<T>(BiVector2<T>);
 
 impl<T> Point2<T>
@@ -122,6 +124,8 @@ where
 /// Three dimensional point
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(transparent)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 pub struct Point3<T>(TriVector3<T>);
 
 impl<T> Point3<T>

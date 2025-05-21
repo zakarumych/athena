@@ -9,6 +9,8 @@ use super::{
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(transparent)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 pub struct Pseudo2<T> {
     pub e012: T,
 }
@@ -251,6 +253,8 @@ where
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(transparent)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
 pub struct Pseudo3<T> {
     pub e0123: T,
 }
