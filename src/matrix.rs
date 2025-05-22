@@ -122,6 +122,27 @@ impl<T, const N: usize, const M: usize> Matrix<T, N, M> {
     }
 }
 
+impl<T, const N: usize> Matrix<T, N, N> {
+    /// Create a new square matrix with diagonal elements set to 1
+    /// and all other elements set to 0.
+    ///
+    /// Such matrix is a multiplicative identity.
+    pub const fn identity() -> Self
+    where
+        T: Num,
+    {
+        let mut elements = [[T::ZERO; N]; N];
+
+        let mut n = 0;
+        while n < N {
+            elements[n][n] = T::ONE;
+            n += 1;
+        }
+
+        Matrix { e: elements }
+    }
+}
+
 impl<T, const M: usize> Matrix<T, 1, M> {
     /// Create a new column vector.
     #[inline(always)]
