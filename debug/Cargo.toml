@@ -9,4 +9,4 @@ athena = { path = ".." }
 eframe = "0.31"
 egui = { version = "0.31" }
 egui-snarl = { git = "https://github.com/zakarumych/egui-snarl" }
-rand = "0.9.1"
+rand = "0.9.3"
