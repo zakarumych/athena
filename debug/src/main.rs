@@ -42,21 +42,21 @@ impl AthenaVisualize {
 }
 
 impl eframe::App for AthenaVisualize {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::TopBottomPanel::top("Menu").show(ctx, |ui| {
+    fn ui(&mut self, ui: &mut egui::Ui, _frame: &mut eframe::Frame) {
+        egui::Panel::top("Menu").show(ui, |ui| {
             global_theme_preference_buttons(ui);
         });
 
-        let size = ctx.viewport(|v| v.this_pass.available_rect);
+        let available_height = ui.available_height();
 
-        egui::TopBottomPanel::top("Graph")
-            .exact_height(size.height() / 2.0)
-            .show(ctx, |ui| {
+        egui::Panel::top("Graph")
+            .min_size(available_height / 2.0)
+            .show(ui, |ui| {
                 ui.label("This is the graph area");
                 self.show = show_nodes(&mut self.snarl, ui);
             });
 
-        egui::SidePanel::left("View Config").show(ctx, |ui| {
+        egui::Panel::left("View Config").show(ui, |ui| {
             let s = self.view_scale.abs().max(1.0) * 0.001;
             ui.add(
                 DragValue::new(&mut self.view_scale)
@@ -78,7 +78,7 @@ impl eframe::App for AthenaVisualize {
             );
         });
 
-        egui::CentralPanel::default().show(ctx, |ui| {
+        egui::CentralPanel::default().show(ui, |ui| {
             let size = ui.available_size();
             let (rect, _response) = ui.allocate_exact_size(size, Sense::empty());
 

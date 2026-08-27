@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use athena::*;
 use egui::{Color32, DragValue, Painter, Shape, Ui, emath::RectTransform};
 use egui_snarl::{
@@ -1131,7 +1129,7 @@ impl SnarlViewer<Node> for AthenaViewer {
                             ),
                         },
                     );
-                    ui.close_menu();
+                    ui.close();
                 }
                 if ui.button("Point2").clicked() {
                     snarl.insert_node(
@@ -1140,7 +1138,7 @@ impl SnarlViewer<Node> for AthenaViewer {
                             point: Point2::ORIGIN,
                         }),
                     );
-                    ui.close_menu();
+                    ui.close();
                 }
                 if ui.button("Point3").clicked() {
                     snarl.insert_node(
@@ -1149,7 +1147,7 @@ impl SnarlViewer<Node> for AthenaViewer {
                             point: Point3::ORIGIN,
                         }),
                     );
-                    ui.close_menu();
+                    ui.close();
                 }
                 if ui.button("Line2").clicked() {
                     snarl.insert_node(
@@ -1158,7 +1156,7 @@ impl SnarlViewer<Node> for AthenaViewer {
                             line: Line2::from_abc(1.0, 1.0, 0.0),
                         }),
                     );
-                    ui.close_menu();
+                    ui.close();
                 }
                 if ui.button("Point to Point Motor2").clicked() {
                     snarl.insert_node(
@@ -1170,7 +1168,7 @@ impl SnarlViewer<Node> for AthenaViewer {
                             motor: Motor2::point_point(Point2::ORIGIN, Point2::ORIGIN),
                         }),
                     );
-                    ui.close_menu();
+                    ui.close();
                 }
                 if ui.button("Line to Line Motor2").clicked() {
                     snarl.insert_node(
@@ -1185,7 +1183,7 @@ impl SnarlViewer<Node> for AthenaViewer {
                             ),
                         }),
                     );
-                    ui.close_menu();
+                    ui.close();
                 }
 
                 if ui.button("Reconstruct Motor2").clicked() {
@@ -1201,7 +1199,7 @@ impl SnarlViewer<Node> for AthenaViewer {
                             ),
                         }),
                     );
-                    ui.close_menu();
+                    ui.close();
                 }
 
                 if ui.button("Apply").clicked() {
@@ -1212,7 +1210,7 @@ impl SnarlViewer<Node> for AthenaViewer {
                             results: Vec::new(),
                         },
                     );
-                    ui.close_menu();
+                    ui.close();
                 }
 
                 if ui.button("Meet").clicked() {
@@ -1224,7 +1222,7 @@ impl SnarlViewer<Node> for AthenaViewer {
                             result: Value::Nil,
                         },
                     );
-                    ui.close_menu();
+                    ui.close();
                 }
 
                 if ui.button("Join").clicked() {
@@ -1236,7 +1234,7 @@ impl SnarlViewer<Node> for AthenaViewer {
                             result: Value::Nil,
                         },
                     );
-                    ui.close_menu();
+                    ui.close();
                 }
 
                 if ui.button("Project").clicked() {
@@ -1248,12 +1246,12 @@ impl SnarlViewer<Node> for AthenaViewer {
                             result: Value::Nil,
                         },
                     );
-                    ui.close_menu();
+                    ui.close();
                 }
 
                 if ui.button("Time").clicked() {
                     snarl.insert_node(pos, Node::Time);
-                    ui.close_menu();
+                    ui.close();
                 }
 
                 if ui.button("Modulo").clicked() {
@@ -1265,7 +1263,7 @@ impl SnarlViewer<Node> for AthenaViewer {
                             result: 0.0,
                         },
                     );
-                    ui.close_menu();
+                    ui.close();
                 }
             });
         });

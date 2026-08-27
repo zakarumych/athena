@@ -6,7 +6,7 @@ publish = false
 
 [dependencies]
 athena = { path = ".." }
-eframe = "0.31"
-egui = { version = "0.31" }
+eframe = "0.36"
+egui = { version = "0.36" }
 egui-snarl = { git = "https://github.com/zakarumych/egui-snarl" }
 rand = "0.9.1"
