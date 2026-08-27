@@ -5,7 +5,7 @@
 //!
 
 use core::{
-    mem::{align_of, offset_of, size_of, MaybeUninit},
+    mem::{align_of, offset_of, size_of},
     ops::{Deref, DerefMut, Index, IndexMut},
 };
 
