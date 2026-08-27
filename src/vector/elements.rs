@@ -54,6 +54,7 @@ macro_rules! impl_swizzle {
                 // #[doc = concat!("assert_eq!(", stringify!($n), ", \"", stringify!($swizzle), "\".len());")]
                 // #[doc = concat!("assert_eq!(\"", $(stringify!($e),)+ "\", \"", stringify!($swizzle), "\");")]
                 // /// ```
+                #[inline]
                 pub fn $swizzle(&self) -> Vector<T, $n> {
                     Vector { e: [$(self.$e,)+] }
                 }

@@ -5,11 +5,6 @@
 #![deny(missing_docs)]
 #![deny(unsafe_code)]
 
-macro_rules! count {
-    () => { 0 };
-    ($head:tt $($tail:tt)*) => { 1 + count!($($tail)*) };
-}
-
 mod scalar;
 // mod simd;
 

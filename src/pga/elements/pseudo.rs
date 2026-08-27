@@ -16,6 +16,7 @@ pub struct Pseudo2<T> {
 }
 
 impl<T> Pseudo2<T> {
+    #[inline]
     pub const fn new(e012: T) -> Self {
         Pseudo2 { e012 }
     }
@@ -70,6 +71,7 @@ where
 {
     type Output = Pseudo2<T>;
 
+    #[inline]
     fn mul(self, rhs: T) -> Pseudo2<T> {
         Pseudo2 {
             e012: self.e012 * rhs,
@@ -81,6 +83,7 @@ impl<T> MulAssign<T> for Pseudo2<T>
 where
     T: Num,
 {
+    #[inline]
     fn mul_assign(&mut self, rhs: T) {
         self.e012 *= rhs;
     }
@@ -92,6 +95,7 @@ where
 {
     type Output = Pseudo2<T>;
 
+    #[inline]
     fn div(self, rhs: T) -> Pseudo2<T> {
         Pseudo2 {
             e012: self.e012 / rhs,
@@ -103,6 +107,7 @@ impl<T> DivAssign<T> for Pseudo2<T>
 where
     T: Num,
 {
+    #[inline]
     fn div_assign(&mut self, rhs: T) {
         self.e012 /= rhs;
     }
@@ -114,6 +119,7 @@ where
 {
     type Output = Pseudo2<T>;
 
+    #[inline]
     fn add(self, rhs: Pseudo2<T>) -> Pseudo2<T> {
         Pseudo2 {
             e012: self.e012 + rhs.e012,
@@ -127,6 +133,7 @@ where
 {
     type Output = Pseudo2<T>;
 
+    #[inline]
     fn sub(self, rhs: Pseudo2<T>) -> Pseudo2<T> {
         Pseudo2 {
             e012: self.e012 - rhs.e012,
@@ -140,6 +147,7 @@ where
 {
     type Output = Pseudo2<T>;
 
+    #[inline]
     fn bitor(self, other: Scalar2<T>) -> Pseudo2<T> {
         Pseudo2 {
             e012: self.e012 * other.0,
@@ -153,6 +161,7 @@ where
 {
     type Output = BiVector2<T>;
 
+    #[inline]
     fn bitor(self, other: Vector2<T>) -> BiVector2<T> {
         BiVector2 {
             e01: self.e012 * other.e2,
@@ -168,6 +177,7 @@ where
 {
     type Output = Vector2<T>;
 
+    #[inline]
     fn bitor(self, other: BiVector2<T>) -> Vector2<T> {
         Vector2 {
             e0: -(self.e012 * other.e12),
@@ -183,6 +193,7 @@ where
 {
     type Output = Pseudo2<T>;
 
+    #[inline]
     fn mul(self, other: Scalar2<T>) -> Pseudo2<T> {
         Pseudo2 {
             e012: self.e012 * other.0,
@@ -194,6 +205,7 @@ impl<T> MulAssign<Scalar2<T>> for Pseudo2<T>
 where
     T: Num,
 {
+    #[inline]
     fn mul_assign(&mut self, other: Scalar2<T>) {
         self.e012 *= other.0;
     }
@@ -205,6 +217,7 @@ where
 {
     type Output = BiVector2<T>;
 
+    #[inline]
     fn mul(self, other: Vector2<T>) -> BiVector2<T> {
         BiVector2 {
             e01: self.e012 * other.e2,
@@ -220,6 +233,7 @@ where
 {
     type Output = Vector2<T>;
 
+    #[inline]
     fn mul(self, other: BiVector2<T>) -> Vector2<T> {
         Vector2 {
             e0: -(self.e012 * other.e12),
@@ -235,6 +249,7 @@ where
 {
     type Output = Pseudo2<T>;
 
+    #[inline]
     fn div(self, other: Scalar2<T>) -> Pseudo2<T> {
         Pseudo2 {
             e012: self.e012 / other.0,
@@ -246,6 +261,7 @@ impl<T> DivAssign<Scalar2<T>> for Pseudo2<T>
 where
     T: Num,
 {
+    #[inline]
     fn div_assign(&mut self, other: Scalar2<T>) {
         self.e012 /= other.0;
     }
@@ -260,6 +276,7 @@ pub struct Pseudo3<T> {
 }
 
 impl<T> Pseudo3<T> {
+    #[inline]
     pub const fn new(e0123: T) -> Self {
         Self { e0123 }
     }
@@ -314,6 +331,7 @@ where
 {
     type Output = Pseudo3<T>;
 
+    #[inline]
     fn mul(self, rhs: T) -> Pseudo3<T> {
         Pseudo3 {
             e0123: self.e0123 * rhs,
@@ -325,6 +343,7 @@ impl<T> MulAssign<T> for Pseudo3<T>
 where
     T: Num,
 {
+    #[inline]
     fn mul_assign(&mut self, rhs: T) {
         self.e0123 *= rhs;
     }
@@ -336,6 +355,7 @@ where
 {
     type Output = Pseudo3<T>;
 
+    #[inline]
     fn div(self, rhs: T) -> Pseudo3<T> {
         Pseudo3 {
             e0123: self.e0123 / rhs,
@@ -347,6 +367,7 @@ impl<T> DivAssign<T> for Pseudo3<T>
 where
     T: Num,
 {
+    #[inline]
     fn div_assign(&mut self, rhs: T) {
         self.e0123 /= rhs;
     }
@@ -358,6 +379,7 @@ where
 {
     type Output = Pseudo3<T>;
 
+    #[inline]
     fn add(self, rhs: Pseudo3<T>) -> Pseudo3<T> {
         Pseudo3 {
             e0123: self.e0123 + rhs.e0123,
@@ -371,6 +393,7 @@ where
 {
     type Output = Pseudo3<T>;
 
+    #[inline]
     fn sub(self, rhs: Pseudo3<T>) -> Pseudo3<T> {
         Pseudo3 {
             e0123: self.e0123 - rhs.e0123,
@@ -384,6 +407,7 @@ where
 {
     type Output = Pseudo3<T>;
 
+    #[inline]
     fn bitor(self, other: T) -> Pseudo3<T> {
         Pseudo3 {
             e0123: self.e0123 * other,
@@ -397,6 +421,7 @@ where
 {
     type Output = TriVector3<T>;
 
+    #[inline]
     fn bitor(self, other: Vector3<T>) -> TriVector3<T> {
         TriVector3 {
             e021: -(self.e0123 * other.e3),
@@ -413,6 +438,7 @@ where
 {
     type Output = XBiVector3<T>;
 
+    #[inline]
     fn bitor(self, other: EBiVector3<T>) -> XBiVector3<T> {
         XBiVector3 {
             e01: -(self.e0123 * other.e23),
@@ -428,6 +454,7 @@ where
 {
     type Output = XBiVector3<T>;
 
+    #[inline]
     fn bitor(self, other: BiVector3<T>) -> XBiVector3<T> {
         XBiVector3 {
             e01: -(self.e0123 * other.e23),
@@ -443,6 +470,7 @@ where
 {
     type Output = Vector3<T>;
 
+    #[inline]
     fn bitor(self, other: TriVector3<T>) -> Vector3<T> {
         Vector3 {
             e0: -(self.e0123 * other.e123),
@@ -459,6 +487,7 @@ where
 {
     type Output = Pseudo3<T>;
 
+    #[inline]
     fn mul(self, other: Scalar3<T>) -> Pseudo3<T> {
         Pseudo3 {
             e0123: self.e0123 * other.0,
@@ -470,6 +499,7 @@ impl<T> MulAssign<Scalar3<T>> for Pseudo3<T>
 where
     T: Num,
 {
+    #[inline]
     fn mul_assign(&mut self, other: Scalar3<T>) {
         self.e0123 *= other.0;
     }
@@ -481,6 +511,7 @@ where
 {
     type Output = TriVector3<T>;
 
+    #[inline]
     fn mul(self, other: Vector3<T>) -> TriVector3<T> {
         TriVector3 {
             e021: -(self.e0123 * other.e3),
@@ -497,6 +528,7 @@ where
 {
     type Output = XBiVector3<T>;
 
+    #[inline]
     fn mul(self, other: EBiVector3<T>) -> XBiVector3<T> {
         XBiVector3 {
             e01: -(self.e0123 * other.e23),
@@ -512,6 +544,7 @@ where
 {
     type Output = XBiVector3<T>;
 
+    #[inline]
     fn mul(self, other: BiVector3<T>) -> XBiVector3<T> {
         XBiVector3 {
             e01: -(self.e0123 * other.e23),
@@ -527,6 +560,7 @@ where
 {
     type Output = Vector3<T>;
 
+    #[inline]
     fn mul(self, other: TriVector3<T>) -> Vector3<T> {
         Vector3 {
             e0: -(self.e0123 * other.e123),
@@ -543,6 +577,7 @@ where
 {
     type Output = Pseudo3<T>;
 
+    #[inline]
     fn div(self, other: Scalar3<T>) -> Pseudo3<T> {
         Pseudo3 {
             e0123: self.e0123 / other.0,
@@ -554,6 +589,7 @@ impl<T> DivAssign<Scalar3<T>> for Pseudo3<T>
 where
     T: Num,
 {
+    #[inline]
     fn div_assign(&mut self, other: Scalar3<T>) {
         self.e0123 /= other.0;
     }

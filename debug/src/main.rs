@@ -82,13 +82,25 @@ impl eframe::App for AthenaVisualize {
             let size = ui.available_size();
             let (rect, _response) = ui.allocate_exact_size(size, Sense::empty());
 
-            let camera = camera(size.x / size.y, 70.0_f32.to_radians());
+            let lesser_dim = f32::min(rect.width(), rect.height());
+            let shrunk_rect = Rect::from_min_max(
+                egui::pos2(
+                    rect.min.x + (rect.width() - lesser_dim) / 2.0,
+                    rect.min.y + (rect.height() - lesser_dim) / 2.0,
+                ),
+                egui::pos2(
+                    rect.max.x - (rect.width() - lesser_dim) / 2.0,
+                    rect.max.y - (rect.height() - lesser_dim) / 2.0,
+                ),
+            );
+
+            let camera = camera(1.0, 70.0_f32.to_radians());
 
             let painter = ui.painter_at(rect);
 
             let rect_transform = RectTransform::from_to(
                 Rect::from_min_max(egui::pos2(-1.0, -1.0), egui::pos2(1.0, 1.0)),
-                rect,
+                shrunk_rect,
             );
 
             for i in -10..=10 {

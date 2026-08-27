@@ -18,6 +18,7 @@ pub struct Matrix<T, const N: usize, const M: usize = N> {
 
 impl<T, const N: usize, const M: usize> Matrix<T, N, M> {
     /// Constructs a new matrix from column arrays
+    #[inline]
     pub const fn from_column_arrays(e: [[T; M]; N]) -> Self {
         Matrix { e }
     }
@@ -112,11 +113,13 @@ impl<T, const N: usize, const M: usize> Matrix<T, N, M> {
     }
 
     /// Returns reference to the matrix elements as arrays.
+    #[inline]
     pub const fn arrays(&self) -> &[[T; M]; N] {
         &self.e
     }
 
     /// Returns mutable reference to the matrix elements as arrays.
+    #[inline]
     pub const fn arrays_mut(&mut self) -> &mut [[T; M]; N] {
         &mut self.e
     }
@@ -183,7 +186,7 @@ where
     type Output = Matrix<T, N, M>;
 
     #[inline]
-    fn mul(self, rhs: &Matrix<T, K, M>) -> Self::Output {
+    fn mul(self, rhs: &Matrix<T, K, M>) -> Matrix<T, N, M> {
         let mut result = Matrix::<T, N, M> {
             e: [[T::ZERO; M]; N],
         };
@@ -207,7 +210,7 @@ where
     type Output = Matrix<T, N, M>;
 
     #[inline(always)]
-    fn mul(self, rhs: Matrix<T, K, M>) -> Self::Output {
+    fn mul(self, rhs: Matrix<T, K, M>) -> Matrix<T, N, M> {
         self.mul(&rhs)
     }
 }
@@ -219,7 +222,7 @@ where
     type Output = Matrix<T, N, M>;
 
     #[inline(always)]
-    fn mul(self, rhs: &Matrix<T, K, M>) -> Self::Output {
+    fn mul(self, rhs: &Matrix<T, K, M>) -> Matrix<T, N, M> {
         (&self).mul(rhs)
     }
 }
@@ -231,7 +234,7 @@ where
     type Output = Matrix<T, N, M>;
 
     #[inline(always)]
-    fn mul(self, rhs: Matrix<T, K, M>) -> Self::Output {
+    fn mul(self, rhs: Matrix<T, K, M>) -> Matrix<T, N, M> {
         (&self).mul(&rhs)
     }
 }

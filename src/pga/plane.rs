@@ -15,10 +15,12 @@ impl<T> Plane3<T>
 where
     T: Num,
 {
+    #[inline]
     pub(super) const fn vector(&self) -> Vector3<T> {
         self.0
     }
 
+    #[inline]
     pub(super) const fn from_vector(vector: Vector3<T>) -> Self {
         Plane3(vector)
     }
@@ -57,26 +59,31 @@ where
     });
 
     /// Creates a new plane from projective vector elements.
+    #[inline]
     pub const fn new(e0: T, e1: T, e2: T, e3: T) -> Self {
         Plane3(Vector3 { e0, e1, e2, e3 })
     }
 
-    /// Returns norm of the line.
-    pub fn norm(&self) -> T {
-        self.0.norm()
+    /// Return the plane as parameters of a linear equation ax + by + cz + d = 0.
+    #[inline]
+    pub fn abcd(&self) -> (T, T, T, T) {
+        (self.0.e1, self.0.e2, self.0.e3, self.0.e0)
     }
 
-    /// Returns squared norm of the line.
-    pub fn norm2(&self) -> T {
-        self.0.norm2()
+    /// Return the plane from parameters of a linear equation ax + by + cz + d = 0.
+    #[inline]
+    pub const fn from_abcd(a: T, b: T, c: T, d: T) -> Self {
+        Plane3::new(d, a, b, c)
     }
 
     /// Normalizes the line.
+    #[inline]
     pub fn normalize(&mut self) {
         self.0.normalize();
     }
 
     /// Returns a normalized line.
+    #[inline]
     pub fn normalized(&self) -> Self {
         Plane3(self.0.normalized())
     }

@@ -2,6 +2,27 @@ use crate::{Matrix, Vector};
 
 struct InPlaceSeed<'a, T: 'a>(&'a mut T);
 
+struct SerializeArray<'a, T, const N: usize>(&'a [T; N]);
+
+impl<'a, T, const N: usize> serde::Serialize for SerializeArray<'a, T, N>
+where
+    T: serde::Serialize,
+{
+    #[inline]
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeTuple;
+
+        let mut seq = serializer.serialize_tuple(N)?;
+        for e in self.0 {
+            seq.serialize_element(e)?;
+        }
+        seq.end()
+    }
+}
+
 impl<'a, 'de, T> serde::de::DeserializeSeed<'de> for InPlaceSeed<'a, T>
 where
     T: serde::de::Deserialize<'de>,
@@ -156,7 +177,7 @@ where
     where
         S: serde::Serializer,
     {
-        self.array().serialize(serializer)
+        SerializeArray(&self.array()).serialize(serializer)
     }
 }
 
@@ -193,10 +214,7 @@ where
     where
         S: serde::Serializer,
     {
-        self.arrays()
-            .each_ref()
-            .map(|a| &a[..])
-            .serialize(serializer)
+        SerializeArray(&self.arrays().each_ref().map(SerializeArray)).serialize(serializer)
     }
 }
 

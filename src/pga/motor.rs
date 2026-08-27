@@ -18,6 +18,7 @@ pub struct Motor2<T> {
 
 impl<T> Motor2<T> {
     /// Creates a new motor from the given scalar and bivector.
+    #[inline]
     pub const fn new(scalar: Scalar2<T>, bivector: BiVector2<T>) -> Self {
         Motor2 { scalar, bivector }
     }
@@ -28,18 +29,21 @@ where
     T: Num,
 {
     /// Returns the scalar part of this motor.
+    #[inline]
     pub const fn scalar(&self) -> Scalar2<T> {
         self.scalar
     }
 
     /// Returns the bivector part of this motor.
+    #[inline]
     pub const fn bivector(&self) -> BiVector2<T> {
         self.bivector
     }
 
     /// Creates a new motor from the given points.
     ///
-    /// The resulting motor moves by the double the distance between the two points.
+    /// The resulting motor moves by the distance between the two points.
+    #[inline]
     pub fn point_point(a: Point2<T>, b: Point2<T>) -> Self {
         let (s, bv) = b.bivector() * !a.bivector();
 
@@ -54,6 +58,7 @@ where
     /// Reconstructs a motor that brings points `a` to points `b`.
     ///
     /// The resulting motor will move a[0] to b[0] and a[1] to the line through b[0] and b[1].
+    #[inline]
     pub fn reconstruct(a: [Point2<T>; 2], b: [Point2<T>; 2]) -> Self {
         // Construct translation motor to move a[0] to b[0].
         let v1 = Self::point_point(a[0], b[0]);
@@ -75,6 +80,7 @@ where
     ///
     /// The resulting motor translates by the distance between the two lines if they are parallel.
     /// If they are not parallel, the motor rotates around the intersection point of the two lines by the angle between them.
+    #[inline]
     pub fn line_line(a: Line2<T>, b: Line2<T>) -> Self {
         let (s, bv) = !b.vector() * !a.vector();
 
@@ -87,6 +93,7 @@ where
     }
 
     /// Moves the given point by this motor.
+    #[inline]
     pub fn move_point(&self, point: Point2<T>) -> Point2<T> {
         let bv0 = self.scalar * point.bivector();
         let (s, bv1) = self.bivector * point.bivector();
@@ -104,6 +111,7 @@ where
     }
 
     /// Moves the given line by this motor.
+    #[inline]
     pub fn move_line(&self, line: Line2<T>) -> Line2<T> {
         let v0 = self.scalar * line.vector();
         let (v1, p) = self.bivector * line.vector();
@@ -121,11 +129,13 @@ where
     }
 
     /// Returns norm of the motor.
+    #[inline]
     pub fn norm(&self) -> T {
         self.norm2().sqrt()
     }
 
     /// Returns squared norm of the motor.
+    #[inline]
     pub fn norm2(&self) -> T {
         let s0 = self.scalar * !self.scalar;
         let s1 = self.bivector | !self.bivector;
@@ -134,6 +144,7 @@ where
     }
 
     /// Normalizes the motor.
+    #[inline]
     pub fn normalize(&mut self) {
         let norm2 = self.norm2();
         if norm2 != T::ZERO {
@@ -144,6 +155,7 @@ where
     }
 
     /// Returns a normalized motor.
+    #[inline]
     pub fn normalized(&self) -> Self {
         let norm2 = self.norm2();
         if norm2 != T::ZERO {
@@ -158,6 +170,7 @@ where
     }
 
     /// Halves the motor.
+    #[inline]
     pub fn sqrt(&self) -> Self {
         Motor2 {
             scalar: (self.scalar + T::ONE),
@@ -173,6 +186,7 @@ where
 {
     type Output = Motor2<T>;
 
+    #[inline]
     fn mul(self, rhs: Motor2<T>) -> Motor2<T> {
         let s0 = self.scalar * rhs.scalar;
         let bv0 = self.scalar * rhs.bivector;
@@ -193,21 +207,22 @@ where
 {
     type Output = Motor2<T>;
 
+    #[inline]
     fn mul(self, rhs: T) -> Motor2<T> {
         if self.bivector.e12 == T::ZERO {
             let log = self.bivector;
 
             let scalar = Scalar2(T::ONE);
-            let distance_halved = log.norm() * rhs;
+            let distance_halved = log.signed_norm() * rhs;
 
             let bivector = log.normalized() * distance_halved;
 
             Motor2 { scalar, bivector }.normalized()
         } else {
-            let atan = T::atan2(self.bivector.norm(), self.scalar.0);
+            let atan = T::atan2(self.bivector.signed_norm(), self.scalar.0);
             let log = self.bivector.normalized() * atan;
 
-            let alpha_halved = log.norm() * rhs;
+            let alpha_halved = log.signed_norm() * rhs;
             let p = log.normalized();
             let (sin, cos) = alpha_halved.sin_cos();
 
@@ -231,6 +246,7 @@ pub struct Motor3<T> {
 
 impl<T> Motor3<T> {
     /// Creates a new motor from the given scalar and bivector.
+    #[inline]
     pub const fn new(scalar: Scalar3<T>, bivector: BiVector3<T>, pseudo: Pseudo3<T>) -> Self {
         Motor3 {
             scalar,
@@ -245,11 +261,13 @@ where
     T: Num,
 {
     /// Returns the scalar part of this motor.
+    #[inline]
     pub const fn scalar(&self) -> Scalar3<T> {
         self.scalar
     }
 
     /// Returns the bivector part of this motor.
+    #[inline]
     pub const fn bivector(&self) -> BiVector3<T> {
         self.bivector
     }
@@ -257,6 +275,7 @@ where
     /// Creates a new motor from the given points.
     ///
     /// The resulting motor moves by the double the distance between the two points.
+    #[inline]
     pub fn point_point(a: Point3<T>, b: Point3<T>) -> Self {
         let (s, bv) = b.trivector() * !a.trivector();
 
@@ -272,6 +291,7 @@ where
     /// Reconstructs a motor that brings points `a` to points `b`.
     ///
     /// The resulting motor will move a[0] to b[0] and a[1] to the line through b[0] and b[1].
+    #[inline]
     pub fn reconstruct(a: [Point3<T>; 3], b: [Point3<T>; 3]) -> Self {
         // Construct translation motor to move a[0] to b[0].
         let v1 = Self::point_point(a[0], b[0]);
@@ -303,6 +323,7 @@ where
     ///
     /// The resulting motor translates by the distance between the two lines if they are parallel.
     /// If they are not parallel, the motor rotates around the intersection point of the two lines by the angle between them.
+    #[inline]
     pub fn line_line(a: Line3<T>, b: Line3<T>) -> Self {
         let (s, bv, p) = !b.bivector() * !a.bivector();
 
@@ -319,6 +340,7 @@ where
     ///
     /// The resulting motor translates by the distance between the two lines if they are parallel.
     /// If they are not parallel, the motor rotates around the intersection point of the two lines by the angle between them.
+    #[inline]
     pub fn plane_plane(a: Plane3<T>, b: Plane3<T>) -> Self {
         let (s, bv) = !b.vector() * !a.vector();
 
@@ -332,6 +354,7 @@ where
     }
 
     /// Moves the given point by this motor.
+    #[inline]
     pub fn move_point(&self, point: Point3<T>) -> Point3<T> {
         let tv0 = self.scalar * point.trivector();
         let (v, tv1) = self.bivector * point.trivector();
@@ -349,6 +372,7 @@ where
     }
 
     /// Moves the given line by this motor.
+    #[inline]
     pub fn move_line(&self, line: Line3<T>) -> Line3<T> {
         let bv0 = self.scalar * line.bivector();
         let (s, bv1, p) = self.bivector * line.bivector();
@@ -370,11 +394,13 @@ where
     }
 
     /// Returns norm of the motor.
+    #[inline]
     pub fn norm(&self) -> T {
         self.norm2().sqrt()
     }
 
     /// Returns squared norm of the motor.
+    #[inline]
     pub fn norm2(&self) -> T {
         let s0 = self.scalar * !self.scalar;
         let s1 = self.bivector | !self.bivector;
@@ -383,6 +409,7 @@ where
     }
 
     /// Normalizes the motor.
+    #[inline]
     pub fn normalize(&mut self) {
         let norm2 = self.norm2();
         if norm2 != T::ZERO {
@@ -393,6 +420,7 @@ where
     }
 
     /// Returns a normalized motor.
+    #[inline]
     pub fn normalized(&self) -> Self {
         let norm2 = self.norm2();
         if norm2 != T::ZERO {
@@ -408,6 +436,7 @@ where
     }
 
     /// Halves the motor.
+    #[inline]
     pub fn sqrt(&self) -> Self {
         let a = Motor3 {
             scalar: (self.scalar + T::ONE),
@@ -428,6 +457,7 @@ where
 {
     type Output = Motor3<T>;
 
+    #[inline]
     fn mul(self, rhs: Motor3<T>) -> Motor3<T> {
         let s0 = self.scalar * rhs.scalar;
         let bv0 = self.scalar * rhs.bivector;
@@ -454,7 +484,39 @@ where
 {
     type Output = Motor3<T>;
 
+    #[inline]
     fn mul(self, rhs: T) -> Motor3<T> {
-        todo!()
+        if self.bivector == BiVector3::ZERO {
+            let log = self.bivector;
+
+            let scalar = Scalar3(T::ONE);
+            let distance_halved = log.norm() * rhs;
+
+            let bivector = log.normalized() * distance_halved;
+
+            Motor3 {
+                scalar,
+                bivector,
+                pseudo: Pseudo3::ZERO,
+            }
+            .normalized()
+        } else {
+            let atan = T::atan2(self.bivector.norm(), self.scalar.0);
+            let log = self.bivector.normalized() * atan;
+
+            let alpha_halved = log.norm() * rhs;
+            let p = log.normalized();
+            let (sin, cos) = alpha_halved.sin_cos();
+
+            let scalar = Scalar3(cos);
+            let bivector = p * sin;
+
+            Motor3 {
+                scalar,
+                bivector,
+                pseudo: Pseudo3::ZERO,
+            }
+            .normalized()
+        }
     }
 }
