@@ -1,6 +1,6 @@
 [package]
 name = "athena"
-version = "0.0.0"
+version = "0.1.0"
 edition = "2021"
 description = "Athena is math crate tailored for game engines, rendering and physics simulations"
 license = "MIT OR Apache-2.0"
