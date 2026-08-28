@@ -2,7 +2,10 @@ use core::ops::{Add, BitOr, BitXor, Div, DivAssign, Mul, MulAssign, Neg, Not, Su
 
 use crate::scalar::Num;
 
-use super::{BiVector3, Dual, EBiVector3, Pseudo3, TriVector3, Vector3, XBiVector3};
+use super::{
+    BiVector3, Dual, EBiVector3, ETriVector3, EVector3, Pseudo3, TriVector3, Vector3, XBiVector3,
+    XTriVector3, XVector3,
+};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(transparent)]
@@ -178,6 +181,30 @@ where
     }
 }
 
+impl<T> BitOr<XVector3<T>> for Scalar3<T>
+where
+    T: Num,
+{
+    type Output = XVector3<T>;
+
+    #[inline]
+    fn bitor(self, other: XVector3<T>) -> XVector3<T> {
+        self * other
+    }
+}
+
+impl<T> BitOr<EVector3<T>> for Scalar3<T>
+where
+    T: Num,
+{
+    type Output = EVector3<T>;
+
+    #[inline]
+    fn bitor(self, other: EVector3<T>) -> EVector3<T> {
+        self * other
+    }
+}
+
 impl<T> BitOr<XBiVector3<T>> for Scalar3<T>
 where
     T: Num,
@@ -210,6 +237,30 @@ where
 
     #[inline]
     fn bitor(self, other: BiVector3<T>) -> BiVector3<T> {
+        self * other
+    }
+}
+
+impl<T> BitOr<XTriVector3<T>> for Scalar3<T>
+where
+    T: Num,
+{
+    type Output = XTriVector3<T>;
+
+    #[inline]
+    fn bitor(self, other: XTriVector3<T>) -> XTriVector3<T> {
+        self * other
+    }
+}
+
+impl<T> BitOr<ETriVector3<T>> for Scalar3<T>
+where
+    T: Num,
+{
+    type Output = ETriVector3<T>;
+
+    #[inline]
+    fn bitor(self, other: ETriVector3<T>) -> ETriVector3<T> {
         self * other
     }
 }
@@ -262,6 +313,30 @@ where
     }
 }
 
+impl<T> BitXor<XVector3<T>> for Scalar3<T>
+where
+    T: Num,
+{
+    type Output = XVector3<T>;
+
+    #[inline]
+    fn bitxor(self, other: XVector3<T>) -> XVector3<T> {
+        self * other
+    }
+}
+
+impl<T> BitXor<EVector3<T>> for Scalar3<T>
+where
+    T: Num,
+{
+    type Output = EVector3<T>;
+
+    #[inline]
+    fn bitxor(self, other: EVector3<T>) -> EVector3<T> {
+        self * other
+    }
+}
+
 impl<T> BitXor<XBiVector3<T>> for Scalar3<T>
 where
     T: Num,
@@ -294,6 +369,30 @@ where
 
     #[inline]
     fn bitxor(self, other: BiVector3<T>) -> BiVector3<T> {
+        self * other
+    }
+}
+
+impl<T> BitXor<XTriVector3<T>> for Scalar3<T>
+where
+    T: Num,
+{
+    type Output = XTriVector3<T>;
+
+    #[inline]
+    fn bitxor(self, other: XTriVector3<T>) -> XTriVector3<T> {
+        self * other
+    }
+}
+
+impl<T> BitXor<ETriVector3<T>> for Scalar3<T>
+where
+    T: Num,
+{
+    type Output = ETriVector3<T>;
+
+    #[inline]
+    fn bitxor(self, other: ETriVector3<T>) -> ETriVector3<T> {
         self * other
     }
 }
@@ -361,6 +460,36 @@ where
     }
 }
 
+impl<T> Mul<XVector3<T>> for Scalar3<T>
+where
+    T: Num,
+{
+    type Output = XVector3<T>;
+
+    #[inline]
+    fn mul(self, other: XVector3<T>) -> XVector3<T> {
+        XVector3 {
+            e0: self.0 * other.e0,
+        }
+    }
+}
+
+impl<T> Mul<EVector3<T>> for Scalar3<T>
+where
+    T: Num,
+{
+    type Output = EVector3<T>;
+
+    #[inline]
+    fn mul(self, other: EVector3<T>) -> EVector3<T> {
+        EVector3 {
+            e1: self.0 * other.e1,
+            e2: self.0 * other.e2,
+            e3: self.0 * other.e3,
+        }
+    }
+}
+
 impl<T> Mul<XBiVector3<T>> for Scalar3<T>
 where
     T: Num,
@@ -408,6 +537,36 @@ where
             e12: self.0 * other.e12,
             e31: self.0 * other.e31,
             e23: self.0 * other.e23,
+        }
+    }
+}
+
+impl<T> Mul<XTriVector3<T>> for Scalar3<T>
+where
+    T: Num,
+{
+    type Output = XTriVector3<T>;
+
+    #[inline]
+    fn mul(self, other: XTriVector3<T>) -> XTriVector3<T> {
+        XTriVector3 {
+            e021: self.0 * other.e021,
+            e013: self.0 * other.e013,
+            e032: self.0 * other.e032,
+        }
+    }
+}
+
+impl<T> Mul<ETriVector3<T>> for Scalar3<T>
+where
+    T: Num,
+{
+    type Output = ETriVector3<T>;
+
+    #[inline]
+    fn mul(self, other: ETriVector3<T>) -> ETriVector3<T> {
+        ETriVector3 {
+            e123: self.0 * other.e123,
         }
     }
 }

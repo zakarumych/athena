@@ -40,12 +40,42 @@ where
         self.bivector
     }
 
+    /// Creates a new motor from the given angle.
+    ///
+    /// The resulting motor rotates counterclockwise by the given angle around the origin.
+    #[inline]
+    pub fn from_angle(angle: T) -> Self {
+        let half_angle = angle * T::HALF;
+        let (sin, cos) = half_angle.sin_cos();
+
+        Motor2 {
+            scalar: Scalar2(cos),
+            bivector: BiVector2::new(T::ZERO, T::ZERO, -sin),
+        }
+    }
+
     /// Creates a new motor from the given points.
     ///
     /// The resulting motor moves by the distance between the two points.
     #[inline]
-    pub fn point_point(a: Point2<T>, b: Point2<T>) -> Self {
+    pub fn from_point_to_point(a: Point2<T>, b: Point2<T>) -> Self {
         let (s, bv) = b.bivector() * !a.bivector();
+
+        let double = Motor2 {
+            scalar: s,
+            bivector: bv,
+        };
+
+        double.normalized().sqrt()
+    }
+
+    /// Creates a new motor from the given lines.
+    ///
+    /// The resulting motor translates by the distance between the two lines if they are parallel.
+    /// If they are not parallel, the motor rotates around the intersection point of the two lines by the angle between them.
+    #[inline]
+    pub fn from_line_to_line(a: Line2<T>, b: Line2<T>) -> Self {
+        let (s, bv) = !b.vector() * !a.vector();
 
         let double = Motor2 {
             scalar: s,
@@ -61,7 +91,7 @@ where
     #[inline]
     pub fn reconstruct(a: [Point2<T>; 2], b: [Point2<T>; 2]) -> Self {
         // Construct translation motor to move a[0] to b[0].
-        let v1 = Self::point_point(a[0], b[0]);
+        let v1 = Self::from_point_to_point(a[0], b[0]);
 
         // Translate a[1].
         let a1 = v1.move_point(a[1]).normalized();
@@ -71,25 +101,9 @@ where
         let al = b[0].join(b[1]);
         let al1 = b[0].join(a1).normalized();
 
-        let v2 = Self::line_line(al1, al).normalized();
+        let v2 = Self::from_line_to_line(al1, al).normalized();
 
         v2 * v1
-    }
-
-    /// Creates a new motor from the given lines.
-    ///
-    /// The resulting motor translates by the distance between the two lines if they are parallel.
-    /// If they are not parallel, the motor rotates around the intersection point of the two lines by the angle between them.
-    #[inline]
-    pub fn line_line(a: Line2<T>, b: Line2<T>) -> Self {
-        let (s, bv) = !b.vector() * !a.vector();
-
-        let double = Motor2 {
-            scalar: s,
-            bivector: bv,
-        };
-
-        double.normalized().sqrt()
     }
 
     /// Moves the given point by this motor.

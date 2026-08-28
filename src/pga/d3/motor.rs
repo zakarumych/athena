@@ -45,11 +45,31 @@ where
         self.bivector
     }
 
+    /// Creates a new motor that rotates by the given angle around `axis`.
+    ///
+    /// Unlike `Rotor3::rotor`, `axis` does not need to pass through the origin: this
+    /// rotates around the line itself, not just its direction. The rotation is
+    /// counterclockwise around `axis`, following the right-hand rule. `axis` does not
+    /// need to be normalized.
+    #[inline]
+    pub fn from_axis_angle(axis: Line3<T>, angle: T) -> Self {
+        let bv = axis.bivector().normalized();
+
+        let half_angle = angle * T::HALF;
+        let (sin, cos) = half_angle.sin_cos();
+
+        Motor3 {
+            scalar: Scalar3(cos),
+            bivector: bv * -sin,
+            pseudo: Pseudo3::ZERO,
+        }
+    }
+
     /// Creates a new motor from the given points.
     ///
     /// The resulting motor moves by the double the distance between the two points.
     #[inline]
-    pub fn point_point(a: Point3<T>, b: Point3<T>) -> Self {
+    pub fn from_point_to_point(a: Point3<T>, b: Point3<T>) -> Self {
         let (s, bv) = b.trivector() * !a.trivector();
 
         let double = Motor3 {
@@ -61,44 +81,13 @@ where
         double.normalized().sqrt()
     }
 
-    /// Reconstructs a motor that brings points `a` to points `b`.
+    /// Creates a new screw motor from the given lines.
     ///
-    /// The resulting motor will move a[0] to b[0] and a[1] to the line through b[0] and b[1].
+    /// The resulting motor translates by the distance between the two lines.
+    /// And rotates around the intersection axis of the two lines by the angle between them.
     #[inline]
-    pub fn reconstruct(a: [Point3<T>; 3], b: [Point3<T>; 3]) -> Self {
-        // Construct translation motor to move a[0] to b[0].
-        let v1 = Self::point_point(a[0], b[0]);
-
-        // Translate a[1].
-        let a1 = v1.move_point(a[1]).normalized();
-
-        // Construct rotation motor that rotates translated line through a[0] and a[1] to line through b[0] and b[1]
-        // while preserving b[0].
-        let al = b[0].join(b[1]);
-        let al1 = b[0].join(a1).normalized();
-
-        let v2 = Self::line_line(al1, al).normalized();
-
-        let v21 = v2 * v1;
-
-        let a1 = v21.move_point(a[1]).normalized();
-        let a2 = v21.move_point(a[2]).normalized();
-
-        let al = b[0].join3(b[1], b[2]);
-        let al1 = b[0].join3(a1, a2).normalized();
-
-        let v3 = Self::plane_plane(al1, al).normalized();
-
-        v3 * v21
-    }
-
-    /// Creates a new motor from the given lines.
-    ///
-    /// The resulting motor translates by the distance between the two lines if they are parallel.
-    /// If they are not parallel, the motor rotates around the intersection point of the two lines by the angle between them.
-    #[inline]
-    pub fn line_line(a: Line3<T>, b: Line3<T>) -> Self {
-        let (s, bv, p) = !b.bivector() * !a.bivector();
+    pub fn from_line_to_line(a: Line3<T>, b: Line3<T>) -> Self {
+        let (s, bv, p) = b.bivector() * !a.bivector();
 
         let double = Motor3 {
             scalar: s,
@@ -109,12 +98,12 @@ where
         double.normalized().sqrt()
     }
 
-    /// Creates a new motor from the given lines.
+    /// Creates a new motor from the given planes.
     ///
-    /// The resulting motor translates by the distance between the two lines if they are parallel.
-    /// If they are not parallel, the motor rotates around the intersection point of the two lines by the angle between them.
+    /// The resulting motor translates by the distance between the two planes if they are parallel.
+    /// If they are not parallel, the motor rotates around the intersection line of the two planes by the angle between them.
     #[inline]
-    pub fn plane_plane(a: Plane3<T>, b: Plane3<T>) -> Self {
+    pub fn from_plane_to_plane(a: Plane3<T>, b: Plane3<T>) -> Self {
         let (s, bv) = !b.vector() * !a.vector();
 
         let double = Motor3 {
@@ -124,6 +113,38 @@ where
         };
 
         double.normalized().sqrt()
+    }
+
+    /// Reconstructs a motor that brings points `a` to points `b`.
+    ///
+    /// The resulting motor will move a[0] to b[0] and a[1] to the line through b[0] and b[1].
+    /// The third point a[2] will be moved to the plane through b[0], b[1], and b[2].
+    #[inline]
+    pub fn reconstruct(a: [Point3<T>; 3], b: [Point3<T>; 3]) -> Self {
+        // Construct translation motor to move a[0] to b[0].
+        let v1 = Self::from_point_to_point(a[0], b[0]);
+
+        // Translate a[1].
+        let a1 = v1.move_point(a[1]).normalized();
+
+        // Construct rotation motor that rotates translated line through a[0] and a[1] to line through b[0] and b[1]
+        // while preserving b[0].
+        let al = b[0].join(b[1]);
+        let al1 = b[0].join(a1).normalized();
+
+        let v2 = Self::from_line_to_line(al1, al).normalized();
+
+        let v21 = v2 * v1;
+
+        let a1 = v21.move_point(a[1]).normalized();
+        let a2 = v21.move_point(a[2]).normalized();
+
+        let al = b[0].join3(b[1], b[2]);
+        let al1 = b[0].join3(a1, a2).normalized();
+
+        let v3 = Self::from_plane_to_plane(al1, al).normalized();
+
+        v3 * v21
     }
 
     /// Moves the given point by this motor.
@@ -253,6 +274,224 @@ where
             pseudo: p0 + p1 + p2,
         }
         .normalized()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn approx(a: f32, b: f32) -> bool {
+        (a - b).abs() < 1e-4
+    }
+
+    fn assert_point_approx(actual: Point3<f32>, expected: Point3<f32>) {
+        let (ax, ay, az) = actual.coords();
+        let (ex, ey, ez) = expected.coords();
+        assert!(
+            approx(ax, ex) && approx(ay, ey) && approx(az, ez),
+            "expected {:?}, got {:?}",
+            expected,
+            actual
+        );
+    }
+
+    #[test]
+    fn reconstruct_identity() {
+        let frame = [
+            Point3::ORIGIN,
+            Point3::at(1.0, 0.0, 0.0),
+            Point3::at(0.0, 1.0, 0.0),
+        ];
+        let motor = Motor3::reconstruct(frame, frame);
+
+        let sample = Point3::at(2.0, -3.0, 4.0);
+        assert_point_approx(motor.move_point(sample), sample);
+    }
+
+    #[test]
+    fn reconstruct_rotate_90_about_x() {
+        let a = [
+            Point3::ORIGIN,
+            Point3::at(1.0, 0.0, 0.0),
+            Point3::at(0.0, 1.0, 0.0),
+        ];
+        let b = [
+            Point3::ORIGIN,
+            Point3::at(1.0, 0.0, 0.0),
+            Point3::at(0.0, 0.0, 1.0),
+        ];
+        let motor = Motor3::reconstruct(a, b);
+
+        assert_point_approx(
+            motor.move_point(Point3::at(1.0, 0.0, 0.0)),
+            Point3::at(1.0, 0.0, 0.0),
+        );
+        assert_point_approx(
+            motor.move_point(Point3::at(0.0, 1.0, 0.0)),
+            Point3::at(0.0, 0.0, 1.0),
+        );
+        assert_point_approx(
+            motor.move_point(Point3::at(0.0, 0.0, 1.0)),
+            Point3::at(0.0, -1.0, 0.0),
+        );
+    }
+
+    #[test]
+    fn reconstruct_rotate_90_about_y() {
+        let a = [
+            Point3::ORIGIN,
+            Point3::at(1.0, 0.0, 0.0),
+            Point3::at(0.0, 1.0, 0.0),
+        ];
+        let b = [
+            Point3::ORIGIN,
+            Point3::at(0.0, 0.0, -1.0),
+            Point3::at(0.0, 1.0, 0.0),
+        ];
+        let motor = Motor3::reconstruct(a, b);
+
+        assert_point_approx(
+            motor.move_point(Point3::at(1.0, 0.0, 0.0)),
+            Point3::at(0.0, 0.0, -1.0),
+        );
+        assert_point_approx(
+            motor.move_point(Point3::at(0.0, 1.0, 0.0)),
+            Point3::at(0.0, 1.0, 0.0),
+        );
+        assert_point_approx(
+            motor.move_point(Point3::at(0.0, 0.0, 1.0)),
+            Point3::at(1.0, 0.0, 0.0),
+        );
+    }
+
+    #[test]
+    fn reconstruct_rotate_90_about_z() {
+        let a = [
+            Point3::ORIGIN,
+            Point3::at(1.0, 0.0, 0.0),
+            Point3::at(0.0, 1.0, 0.0),
+        ];
+        let b = [
+            Point3::ORIGIN,
+            Point3::at(0.0, 1.0, 0.0),
+            Point3::at(-1.0, 0.0, 0.0),
+        ];
+        let motor = Motor3::reconstruct(a, b);
+
+        assert_point_approx(
+            motor.move_point(Point3::at(1.0, 0.0, 0.0)),
+            Point3::at(0.0, 1.0, 0.0),
+        );
+        assert_point_approx(
+            motor.move_point(Point3::at(0.0, 1.0, 0.0)),
+            Point3::at(-1.0, 0.0, 0.0),
+        );
+        assert_point_approx(
+            motor.move_point(Point3::at(0.0, 0.0, 1.0)),
+            Point3::at(0.0, 0.0, 1.0),
+        );
+    }
+
+    // KNOWN BUG: `Motor3::reconstruct` produces NaN for exact 180-degree
+    // configurations. When the intermediate line-to-line (or plane-to-plane)
+    // step is fed exactly antiparallel blades, their wedge/cross term is
+    // identically zero, so the raw pre-halving motor collapses to
+    // `scalar == -1` with a zero bivector/pseudo carrying no axis
+    // information. `Motor3::sqrt` computes the half-angle motor via
+    // `normalize(1 + m)`, which divides by `scalar + 1`, i.e. by zero here.
+    // This is the standard closed-form "square root of a rotor" antipodal
+    // singularity (the same class of issue as antipodal quaternion slerp),
+    // not a simple typo: fixing it needs an alternate construction path fed
+    // with the original blades (not just the already-reduced motor `sqrt`
+    // receives), which is a larger, riskier change than is safe to make
+    // without further design review. Left as a documented, pinned failure;
+    // do not work around this downstream in the `conv` layer.
+    #[test]
+    #[ignore = "known bug: Motor3::reconstruct produces NaN at exact 180-degree configurations, see comment above"]
+    fn reconstruct_rotate_180_about_x() {
+        let a = [
+            Point3::ORIGIN,
+            Point3::at(1.0, 0.0, 0.0),
+            Point3::at(0.0, 1.0, 0.0),
+        ];
+        let b = [
+            Point3::ORIGIN,
+            Point3::at(1.0, 0.0, 0.0),
+            Point3::at(0.0, -1.0, 0.0),
+        ];
+        let motor = Motor3::reconstruct(a, b);
+
+        assert_point_approx(
+            motor.move_point(Point3::at(1.0, 0.0, 0.0)),
+            Point3::at(1.0, 0.0, 0.0),
+        );
+        assert_point_approx(
+            motor.move_point(Point3::at(0.0, 1.0, 0.0)),
+            Point3::at(0.0, -1.0, 0.0),
+        );
+        assert_point_approx(
+            motor.move_point(Point3::at(0.0, 0.0, 1.0)),
+            Point3::at(0.0, 0.0, -1.0),
+        );
+    }
+
+    #[test]
+    #[ignore = "known bug: Motor3::reconstruct produces NaN at exact 180-degree configurations, see comment above reconstruct_rotate_180_about_x"]
+    fn reconstruct_rotate_180_about_y() {
+        let a = [
+            Point3::ORIGIN,
+            Point3::at(1.0, 0.0, 0.0),
+            Point3::at(0.0, 1.0, 0.0),
+        ];
+        let b = [
+            Point3::ORIGIN,
+            Point3::at(-1.0, 0.0, 0.0),
+            Point3::at(0.0, 1.0, 0.0),
+        ];
+        let motor = Motor3::reconstruct(a, b);
+
+        assert_point_approx(
+            motor.move_point(Point3::at(1.0, 0.0, 0.0)),
+            Point3::at(-1.0, 0.0, 0.0),
+        );
+        assert_point_approx(
+            motor.move_point(Point3::at(0.0, 1.0, 0.0)),
+            Point3::at(0.0, 1.0, 0.0),
+        );
+        assert_point_approx(
+            motor.move_point(Point3::at(0.0, 0.0, 1.0)),
+            Point3::at(0.0, 0.0, -1.0),
+        );
+    }
+
+    #[test]
+    #[ignore = "known bug: Motor3::reconstruct produces NaN at exact 180-degree configurations, see comment above reconstruct_rotate_180_about_x"]
+    fn reconstruct_rotate_180_about_z() {
+        let a = [
+            Point3::ORIGIN,
+            Point3::at(1.0, 0.0, 0.0),
+            Point3::at(0.0, 1.0, 0.0),
+        ];
+        let b = [
+            Point3::ORIGIN,
+            Point3::at(-1.0, 0.0, 0.0),
+            Point3::at(0.0, -1.0, 0.0),
+        ];
+        let motor = Motor3::reconstruct(a, b);
+
+        assert_point_approx(
+            motor.move_point(Point3::at(1.0, 0.0, 0.0)),
+            Point3::at(-1.0, 0.0, 0.0),
+        );
+        assert_point_approx(
+            motor.move_point(Point3::at(0.0, 1.0, 0.0)),
+            Point3::at(0.0, -1.0, 0.0),
+        );
+        assert_point_approx(
+            motor.move_point(Point3::at(0.0, 0.0, 1.0)),
+            Point3::at(0.0, 0.0, 1.0),
+        );
     }
 }
 

@@ -2,7 +2,7 @@ use core::ops::{Add, BitOr, BitXor, Div, DivAssign, Mul, MulAssign, Neg, Not, Su
 
 use crate::scalar::Num;
 
-use super::{BiVector2, Dual, Pseudo2, Vector2};
+use super::{BiVector2, Dual, EBiVector2, EVector2, Pseudo2, Vector2, XBiVector2, XVector2};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(transparent)]
@@ -169,6 +169,54 @@ where
     }
 }
 
+impl<T> BitOr<XVector2<T>> for Scalar2<T>
+where
+    T: Num,
+{
+    type Output = XVector2<T>;
+
+    #[inline]
+    fn bitor(self, other: XVector2<T>) -> XVector2<T> {
+        self * other
+    }
+}
+
+impl<T> BitOr<EVector2<T>> for Scalar2<T>
+where
+    T: Num,
+{
+    type Output = EVector2<T>;
+
+    #[inline]
+    fn bitor(self, other: EVector2<T>) -> EVector2<T> {
+        self * other
+    }
+}
+
+impl<T> BitOr<XBiVector2<T>> for Scalar2<T>
+where
+    T: Num,
+{
+    type Output = XBiVector2<T>;
+
+    #[inline]
+    fn bitor(self, other: XBiVector2<T>) -> XBiVector2<T> {
+        self * other
+    }
+}
+
+impl<T> BitOr<EBiVector2<T>> for Scalar2<T>
+where
+    T: Num,
+{
+    type Output = EBiVector2<T>;
+
+    #[inline]
+    fn bitor(self, other: EBiVector2<T>) -> EBiVector2<T> {
+        self * other
+    }
+}
+
 impl<T> BitOr<BiVector2<T>> for Scalar2<T>
 where
     T: Num,
@@ -213,6 +261,54 @@ where
 
     #[inline]
     fn bitxor(self, other: Vector2<T>) -> Vector2<T> {
+        self * other
+    }
+}
+
+impl<T> BitXor<XVector2<T>> for Scalar2<T>
+where
+    T: Num,
+{
+    type Output = XVector2<T>;
+
+    #[inline]
+    fn bitxor(self, other: XVector2<T>) -> XVector2<T> {
+        self * other
+    }
+}
+
+impl<T> BitXor<EVector2<T>> for Scalar2<T>
+where
+    T: Num,
+{
+    type Output = EVector2<T>;
+
+    #[inline]
+    fn bitxor(self, other: EVector2<T>) -> EVector2<T> {
+        self * other
+    }
+}
+
+impl<T> BitXor<XBiVector2<T>> for Scalar2<T>
+where
+    T: Num,
+{
+    type Output = XBiVector2<T>;
+
+    #[inline]
+    fn bitxor(self, other: XBiVector2<T>) -> XBiVector2<T> {
+        self * other
+    }
+}
+
+impl<T> BitXor<EBiVector2<T>> for Scalar2<T>
+where
+    T: Num,
+{
+    type Output = EBiVector2<T>;
+
+    #[inline]
+    fn bitxor(self, other: EBiVector2<T>) -> EBiVector2<T> {
         self * other
     }
 }
@@ -275,6 +371,64 @@ where
             e0: self.0 * other.e0,
             e1: self.0 * other.e1,
             e2: self.0 * other.e2,
+        }
+    }
+}
+
+impl<T> Mul<XVector2<T>> for Scalar2<T>
+where
+    T: Num,
+{
+    type Output = XVector2<T>;
+
+    #[inline]
+    fn mul(self, other: XVector2<T>) -> XVector2<T> {
+        XVector2 {
+            e0: self.0 * other.e0,
+        }
+    }
+}
+
+impl<T> Mul<EVector2<T>> for Scalar2<T>
+where
+    T: Num,
+{
+    type Output = EVector2<T>;
+
+    #[inline]
+    fn mul(self, other: EVector2<T>) -> EVector2<T> {
+        EVector2 {
+            e1: self.0 * other.e1,
+            e2: self.0 * other.e2,
+        }
+    }
+}
+
+impl<T> Mul<XBiVector2<T>> for Scalar2<T>
+where
+    T: Num,
+{
+    type Output = XBiVector2<T>;
+
+    #[inline]
+    fn mul(self, other: XBiVector2<T>) -> XBiVector2<T> {
+        XBiVector2 {
+            e01: self.0 * other.e01,
+            e20: self.0 * other.e20,
+        }
+    }
+}
+
+impl<T> Mul<EBiVector2<T>> for Scalar2<T>
+where
+    T: Num,
+{
+    type Output = EBiVector2<T>;
+
+    #[inline]
+    fn mul(self, other: EBiVector2<T>) -> EBiVector2<T> {
+        EBiVector2 {
+            e12: self.0 * other.e12,
         }
     }
 }

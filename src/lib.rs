@@ -14,6 +14,9 @@ mod lina;
 #[cfg(any(feature = "pga2", feature = "pga3"))]
 mod pga;
 
+#[cfg(all(feature = "lina", any(feature = "pga2", feature = "pga3")))]
+mod conv;
+
 pub use self::scalar::*;
 
 #[cfg(feature = "lina")]

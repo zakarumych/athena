@@ -2,7 +2,7 @@ use core::ops::{Add, BitOr, Div, DivAssign, Mul, MulAssign, Neg, Not, Sub};
 
 use crate::scalar::Num;
 
-use super::{BiVector2, Dual, Scalar2, Vector2};
+use super::{BiVector2, Dual, EBiVector2, EVector2, Scalar2, Vector2, XBiVector2};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(transparent)]
@@ -168,6 +168,37 @@ where
     }
 }
 
+impl<T> BitOr<EVector2<T>> for Pseudo2<T>
+where
+    T: Num,
+{
+    type Output = XBiVector2<T>;
+
+    #[inline]
+    fn bitor(self, other: EVector2<T>) -> XBiVector2<T> {
+        XBiVector2 {
+            e01: self.e012 * other.e2,
+            e20: self.e012 * other.e1,
+        }
+    }
+}
+
+impl<T> BitOr<EBiVector2<T>> for Pseudo2<T>
+where
+    T: Num,
+{
+    type Output = Vector2<T>;
+
+    #[inline]
+    fn bitor(self, other: EBiVector2<T>) -> Vector2<T> {
+        Vector2 {
+            e0: -(self.e012 * other.e12),
+            e1: T::ZERO,
+            e2: T::ZERO,
+        }
+    }
+}
+
 impl<T> BitOr<BiVector2<T>> for Pseudo2<T>
 where
     T: Num,
@@ -220,6 +251,34 @@ where
             e01: self.e012 * other.e2,
             e20: self.e012 * other.e1,
             e12: T::ZERO,
+        }
+    }
+}
+
+impl<T> Mul<EVector2<T>> for Pseudo2<T>
+where
+    T: Num,
+{
+    type Output = XBiVector2<T>;
+
+    #[inline]
+    fn mul(self, other: EVector2<T>) -> XBiVector2<T> {
+        self | other
+    }
+}
+
+impl<T> Mul<EBiVector2<T>> for Pseudo2<T>
+where
+    T: Num,
+{
+    type Output = Vector2<T>;
+
+    #[inline]
+    fn mul(self, other: EBiVector2<T>) -> Vector2<T> {
+        Vector2 {
+            e0: -(self.e012 * other.e12),
+            e1: T::ZERO,
+            e2: T::ZERO,
         }
     }
 }

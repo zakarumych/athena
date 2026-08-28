@@ -2,7 +2,9 @@ use core::ops::{Add, BitOr, Div, DivAssign, Mul, MulAssign, Neg, Not, Sub};
 
 use crate::scalar::Num;
 
-use super::{BiVector3, Dual, EBiVector3, Scalar3, TriVector3, Vector3, XBiVector3};
+use super::{
+    BiVector3, Dual, EBiVector3, EVector3, Scalar3, TriVector3, Vector3, XBiVector3, XTriVector3,
+};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 #[repr(transparent)]
@@ -169,6 +171,22 @@ where
     }
 }
 
+impl<T> BitOr<EVector3<T>> for Pseudo3<T>
+where
+    T: Num,
+{
+    type Output = XTriVector3<T>;
+
+    #[inline]
+    fn bitor(self, other: EVector3<T>) -> XTriVector3<T> {
+        XTriVector3 {
+            e021: -(self.e0123 * other.e3),
+            e013: -(self.e0123 * other.e2),
+            e032: -(self.e0123 * other.e1),
+        }
+    }
+}
+
 impl<T> BitOr<EBiVector3<T>> for Pseudo3<T>
 where
     T: Num,
@@ -256,6 +274,18 @@ where
             e032: -(self.e0123 * other.e1),
             e123: T::ZERO,
         }
+    }
+}
+
+impl<T> Mul<EVector3<T>> for Pseudo3<T>
+where
+    T: Num,
+{
+    type Output = XTriVector3<T>;
+
+    #[inline]
+    fn mul(self, other: EVector3<T>) -> XTriVector3<T> {
+        self | other
     }
 }
 

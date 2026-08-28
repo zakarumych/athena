@@ -29,7 +29,7 @@ where
     ));
 
     #[inline]
-    pub(super) const fn bivector(&self) -> BiVector3<T> {
+    pub(crate) const fn bivector(&self) -> BiVector3<T> {
         self.0
     }
 
