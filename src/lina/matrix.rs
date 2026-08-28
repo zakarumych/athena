@@ -3,7 +3,7 @@
 
 use core::{
     mem::{ManuallyDrop, MaybeUninit},
-    ops::{Mul, MulAssign},
+    ops::{Add, AddAssign, Mul, MulAssign, Sub, SubAssign},
 };
 
 use crate::{Num, Vector};
@@ -146,6 +146,218 @@ impl<T, const N: usize> Matrix<T, N, N> {
     }
 }
 
+impl<T, const N: usize, const M: usize> Add<Matrix<T, N, M>> for Matrix<T, N, M>
+where
+    T: Num,
+{
+    type Output = Matrix<T, N, M>;
+
+    #[inline]
+    fn add(self, rhs: Matrix<T, N, M>) -> Matrix<T, N, M> {
+        let mut result = Matrix {
+            e: [[T::ZERO; M]; N],
+        };
+
+        for n in 0..N {
+            for m in 0..M {
+                result.e[n][m] = self.e[n][m] + rhs.e[n][m];
+            }
+        }
+
+        result
+    }
+}
+
+impl<T, const N: usize, const M: usize> Add<&Matrix<T, N, M>> for &Matrix<T, N, M>
+where
+    T: Num,
+{
+    type Output = Matrix<T, N, M>;
+
+    #[inline(always)]
+    fn add(self, rhs: &Matrix<T, N, M>) -> Matrix<T, N, M> {
+        *self + *rhs
+    }
+}
+
+impl<T, const N: usize, const M: usize> Add<&Matrix<T, N, M>> for Matrix<T, N, M>
+where
+    T: Num,
+{
+    type Output = Matrix<T, N, M>;
+
+    #[inline(always)]
+    fn add(self, rhs: &Matrix<T, N, M>) -> Matrix<T, N, M> {
+        self + *rhs
+    }
+}
+
+impl<T, const N: usize, const M: usize> Add<Matrix<T, N, M>> for &Matrix<T, N, M>
+where
+    T: Num,
+{
+    type Output = Matrix<T, N, M>;
+
+    #[inline(always)]
+    fn add(self, rhs: Matrix<T, N, M>) -> Matrix<T, N, M> {
+        *self + rhs
+    }
+}
+
+impl<T, const N: usize, const M: usize> AddAssign<Matrix<T, N, M>> for Matrix<T, N, M>
+where
+    T: Num,
+{
+    #[inline]
+    fn add_assign(&mut self, rhs: Matrix<T, N, M>) {
+        for n in 0..N {
+            for m in 0..M {
+                self.e[n][m] += rhs.e[n][m];
+            }
+        }
+    }
+}
+
+impl<T, const N: usize, const M: usize> AddAssign<&Matrix<T, N, M>> for Matrix<T, N, M>
+where
+    T: Num,
+{
+    #[inline(always)]
+    fn add_assign(&mut self, rhs: &Matrix<T, N, M>) {
+        *self += *rhs;
+    }
+}
+
+impl<T, const N: usize, const M: usize> Sub<Matrix<T, N, M>> for Matrix<T, N, M>
+where
+    T: Num,
+{
+    type Output = Matrix<T, N, M>;
+
+    #[inline]
+    fn sub(self, rhs: Matrix<T, N, M>) -> Matrix<T, N, M> {
+        let mut result = Matrix {
+            e: [[T::ZERO; M]; N],
+        };
+
+        for n in 0..N {
+            for m in 0..M {
+                result.e[n][m] = self.e[n][m] - rhs.e[n][m];
+            }
+        }
+
+        result
+    }
+}
+
+impl<T, const N: usize, const M: usize> Sub<&Matrix<T, N, M>> for &Matrix<T, N, M>
+where
+    T: Num,
+{
+    type Output = Matrix<T, N, M>;
+
+    #[inline(always)]
+    fn sub(self, rhs: &Matrix<T, N, M>) -> Matrix<T, N, M> {
+        *self - *rhs
+    }
+}
+
+impl<T, const N: usize, const M: usize> Sub<&Matrix<T, N, M>> for Matrix<T, N, M>
+where
+    T: Num,
+{
+    type Output = Matrix<T, N, M>;
+
+    #[inline(always)]
+    fn sub(self, rhs: &Matrix<T, N, M>) -> Matrix<T, N, M> {
+        self - *rhs
+    }
+}
+
+impl<T, const N: usize, const M: usize> Sub<Matrix<T, N, M>> for &Matrix<T, N, M>
+where
+    T: Num,
+{
+    type Output = Matrix<T, N, M>;
+
+    #[inline(always)]
+    fn sub(self, rhs: Matrix<T, N, M>) -> Matrix<T, N, M> {
+        *self - rhs
+    }
+}
+
+impl<T, const N: usize, const M: usize> SubAssign<Matrix<T, N, M>> for Matrix<T, N, M>
+where
+    T: Num,
+{
+    #[inline]
+    fn sub_assign(&mut self, rhs: Matrix<T, N, M>) {
+        for n in 0..N {
+            for m in 0..M {
+                self.e[n][m] -= rhs.e[n][m];
+            }
+        }
+    }
+}
+
+impl<T, const N: usize, const M: usize> SubAssign<&Matrix<T, N, M>> for Matrix<T, N, M>
+where
+    T: Num,
+{
+    #[inline(always)]
+    fn sub_assign(&mut self, rhs: &Matrix<T, N, M>) {
+        *self -= *rhs;
+    }
+}
+
+impl<T, const N: usize, const M: usize> Mul<T> for Matrix<T, N, M>
+where
+    T: Num,
+{
+    type Output = Matrix<T, N, M>;
+
+    #[inline]
+    fn mul(self, rhs: T) -> Matrix<T, N, M> {
+        let mut result = Matrix {
+            e: [[T::ZERO; M]; N],
+        };
+
+        for n in 0..N {
+            for m in 0..M {
+                result.e[n][m] = self.e[n][m] * rhs;
+            }
+        }
+
+        result
+    }
+}
+
+impl<T, const N: usize, const M: usize> Mul<T> for &Matrix<T, N, M>
+where
+    T: Num,
+{
+    type Output = Matrix<T, N, M>;
+
+    #[inline(always)]
+    fn mul(self, rhs: T) -> Matrix<T, N, M> {
+        *self * rhs
+    }
+}
+
+impl<T, const N: usize, const M: usize> MulAssign<T> for Matrix<T, N, M>
+where
+    T: Num,
+{
+    #[inline]
+    fn mul_assign(&mut self, rhs: T) {
+        for n in 0..N {
+            for m in 0..M {
+                self.e[n][m] *= rhs;
+            }
+        }
+    }
+}
+
 impl<T, const M: usize> Matrix<T, 1, M> {
     /// Create a new column vector.
     #[inline(always)]
@@ -176,6 +388,65 @@ impl<T, const N: usize> Matrix<T, N, 1> {
     #[inline(always)]
     pub fn into_row(self) -> Vector<T, N> {
         Vector::from_array(self.e.map(|[v]| v))
+    }
+}
+
+impl<T, const N: usize, const M: usize> Mul<Vector<T, M>> for Vector<T, N>
+where
+    T: Num,
+{
+    type Output = Matrix<T, N, M>;
+
+    /// Returns the outer product of two vectors.
+    #[inline(always)]
+    fn mul(self, rhs: Vector<T, M>) -> Matrix<T, N, M> {
+        Mul::mul(&self, &rhs)
+    }
+}
+
+impl<T, const N: usize, const M: usize> Mul<&Vector<T, M>> for Vector<T, N>
+where
+    T: Num,
+{
+    type Output = Matrix<T, N, M>;
+
+    #[inline(always)]
+    fn mul(self, rhs: &Vector<T, M>) -> Matrix<T, N, M> {
+        Mul::mul(&self, rhs)
+    }
+}
+
+impl<T, const N: usize, const M: usize> Mul<Vector<T, M>> for &Vector<T, N>
+where
+    T: Num,
+{
+    type Output = Matrix<T, N, M>;
+
+    #[inline(always)]
+    fn mul(self, rhs: Vector<T, M>) -> Matrix<T, N, M> {
+        *self * rhs
+    }
+}
+
+impl<T, const N: usize, const M: usize> Mul<&Vector<T, M>> for &Vector<T, N>
+where
+    T: Num,
+{
+    type Output = Matrix<T, N, M>;
+
+    #[inline]
+    fn mul(self, rhs: &Vector<T, M>) -> Matrix<T, N, M> {
+        let mut result = Matrix {
+            e: [[T::ZERO; M]; N],
+        };
+
+        for n in 0..N {
+            for m in 0..M {
+                result.e[n][m] = self[n] * rhs[m];
+            }
+        }
+
+        result
     }
 }
 
@@ -430,3 +701,50 @@ pub type Matrix3<T> = Matrix<T, 3>;
 
 /// Matrix with 4 columns and 4 rows.
 pub type Matrix4<T> = Matrix<T, 4>;
+
+#[cfg(test)]
+mod tests {
+    use super::Matrix2x3;
+    use crate::Vector2;
+    use crate::Vector3;
+
+    #[test]
+    fn matrix_component_arithmetic() {
+        let lhs = Matrix2x3::from_column_arrays([[1.0f32, 2.0, 3.0], [4.0, 5.0, 6.0]]);
+        let rhs = Matrix2x3::from_column_arrays([[6.0f32, 5.0, 4.0], [3.0, 2.0, 1.0]]);
+
+        assert_eq!(
+            lhs + rhs,
+            Matrix2x3::from_column_arrays([[7.0, 7.0, 7.0], [7.0, 7.0, 7.0]])
+        );
+        assert_eq!(
+            lhs - rhs,
+            Matrix2x3::from_column_arrays([[-5.0, -3.0, -1.0], [1.0, 3.0, 5.0]])
+        );
+        assert_eq!(
+            lhs * 2.0,
+            Matrix2x3::from_column_arrays([[2.0, 4.0, 6.0], [8.0, 10.0, 12.0]])
+        );
+
+        let mut value = lhs;
+        value += &rhs;
+        value -= rhs;
+        value *= 3.0;
+        assert_eq!(
+            value,
+            Matrix2x3::from_column_arrays([[3.0, 6.0, 9.0], [12.0, 15.0, 18.0]])
+        );
+    }
+
+    #[test]
+    fn vector_outer_product() {
+        let lhs = Vector2::new(2.0f32, 3.0);
+        let rhs = Vector3::new(4.0f32, 5.0, 6.0);
+        let expected = Matrix2x3::from_column_arrays([[8.0, 10.0, 12.0], [12.0, 15.0, 18.0]]);
+
+        assert_eq!(lhs * rhs, expected);
+        assert_eq!(&lhs * &rhs, expected);
+        assert_eq!(lhs * &rhs, expected);
+        assert_eq!(&lhs * rhs, expected);
+    }
+}

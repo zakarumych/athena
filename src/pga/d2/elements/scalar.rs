@@ -15,6 +15,15 @@ impl<T> Scalar2<T> {
     pub const fn new(s: T) -> Self {
         Scalar2(s)
     }
+
+    #[inline]
+    pub fn is_near_zero(&self) -> bool
+    where
+        T: Num,
+    {
+        let epsilon = T::EPSILON;
+        self.0.abs() < epsilon
+    }
 }
 
 impl<T> Neg for Scalar2<T>

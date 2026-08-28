@@ -1,4 +1,4 @@
-use core::ops::{Add, BitOr, Div, DivAssign, Mul, MulAssign, Neg, Not, Sub};
+use core::ops::{Add, BitOr, BitXor, Div, DivAssign, Mul, MulAssign, Neg, Not, Sub};
 
 use crate::scalar::Num;
 
@@ -212,6 +212,18 @@ where
             e1: T::ZERO,
             e2: T::ZERO,
         }
+    }
+}
+
+impl<T> BitXor<Scalar2<T>> for Pseudo2<T>
+where
+    T: Num,
+{
+    type Output = Pseudo2<T>;
+
+    #[inline]
+    fn bitxor(self, other: Scalar2<T>) -> Pseudo2<T> {
+        self * other
     }
 }
 

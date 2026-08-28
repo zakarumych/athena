@@ -205,7 +205,11 @@ mod tests {
             let matrix: Matrix2<f32> = rotor.into();
             let rotor2: Rotor2<f32> = matrix.into();
 
-            let samples = [Point2::at(1.0f32, 0.0), Point2::at(2.0, 3.0), Point2::at(-1.5, 0.5)];
+            let samples = [
+                Point2::at(1.0f32, 0.0),
+                Point2::at(2.0, 3.0),
+                Point2::at(-1.5, 0.5),
+            ];
 
             for &sample in &samples {
                 let expected = rotor.move_point(sample);
@@ -246,7 +250,11 @@ mod tests {
         let matrix: Matrix3<f32> = motor.into();
         let motor2: Motor2<f32> = matrix.into();
 
-        let samples = [Point2::at(1.0f32, 0.0), Point2::at(2.0, 3.0), Point2::at(-1.5, 0.5)];
+        let samples = [
+            Point2::at(1.0f32, 0.0),
+            Point2::at(2.0, 3.0),
+            Point2::at(-1.5, 0.5),
+        ];
 
         for &sample in &samples {
             let expected = motor.move_point(sample);

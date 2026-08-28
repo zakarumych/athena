@@ -446,6 +446,30 @@ where
     }
 }
 
+impl<T> Mul<XVector2<T>> for Vector2<T>
+where
+    T: Num,
+{
+    type Output = XBiVector2<T>;
+
+    #[inline]
+    fn mul(self, other: XVector2<T>) -> XBiVector2<T> {
+        self ^ other
+    }
+}
+
+impl<T> Mul<EVector2<T>> for Vector2<T>
+where
+    T: Num,
+{
+    type Output = (Scalar2<T>, BiVector2<T>);
+
+    #[inline]
+    fn mul(self, other: EVector2<T>) -> (Scalar2<T>, BiVector2<T>) {
+        (self | other, self ^ other)
+    }
+}
+
 impl<T> Div<Scalar2<T>> for Vector2<T>
 where
     T: Num,
@@ -818,6 +842,49 @@ where
     }
 }
 
+impl<T> BitXor<Vector2<T>> for XVector2<T>
+where
+    T: Num,
+{
+    type Output = XBiVector2<T>;
+
+    #[inline]
+    fn bitxor(self, other: Vector2<T>) -> XBiVector2<T> {
+        XBiVector2 {
+            e01: self.e0 * other.e1,
+            e20: -(self.e0 * other.e2),
+        }
+    }
+}
+
+impl<T> BitXor<EBiVector2<T>> for XVector2<T>
+where
+    T: Num,
+{
+    type Output = Pseudo2<T>;
+
+    #[inline]
+    fn bitxor(self, other: EBiVector2<T>) -> Pseudo2<T> {
+        Pseudo2 {
+            e012: self.e0 * other.e12,
+        }
+    }
+}
+
+impl<T> BitXor<BiVector2<T>> for XVector2<T>
+where
+    T: Num,
+{
+    type Output = Pseudo2<T>;
+
+    #[inline]
+    fn bitxor(self, other: BiVector2<T>) -> Pseudo2<T> {
+        Pseudo2 {
+            e012: self.e0 * other.e12,
+        }
+    }
+}
+
 impl<T> Mul<Scalar2<T>> for XVector2<T>
 where
     T: Num,
@@ -850,6 +917,42 @@ where
 
     #[inline]
     fn mul(self, other: EVector2<T>) -> XBiVector2<T> {
+        self ^ other
+    }
+}
+
+impl<T> Mul<Vector2<T>> for XVector2<T>
+where
+    T: Num,
+{
+    type Output = XBiVector2<T>;
+
+    #[inline]
+    fn mul(self, other: Vector2<T>) -> XBiVector2<T> {
+        self ^ other
+    }
+}
+
+impl<T> Mul<EBiVector2<T>> for XVector2<T>
+where
+    T: Num,
+{
+    type Output = Pseudo2<T>;
+
+    #[inline]
+    fn mul(self, other: EBiVector2<T>) -> Pseudo2<T> {
+        self ^ other
+    }
+}
+
+impl<T> Mul<BiVector2<T>> for XVector2<T>
+where
+    T: Num,
+{
+    type Output = Pseudo2<T>;
+
+    #[inline]
+    fn mul(self, other: BiVector2<T>) -> Pseudo2<T> {
         self ^ other
     }
 }
@@ -1151,6 +1254,78 @@ where
     }
 }
 
+impl<T> BitOr<Vector2<T>> for EVector2<T>
+where
+    T: Num,
+{
+    type Output = Scalar2<T>;
+
+    #[inline]
+    fn bitor(self, other: Vector2<T>) -> Scalar2<T> {
+        Scalar2(self.e1 * other.e1 + self.e2 * other.e2)
+    }
+}
+
+impl<T> BitOr<XBiVector2<T>> for EVector2<T>
+where
+    T: Num,
+{
+    type Output = XVector2<T>;
+
+    #[inline]
+    fn bitor(self, other: XBiVector2<T>) -> XVector2<T> {
+        XVector2 {
+            e0: self.e2 * other.e20 - self.e1 * other.e01,
+        }
+    }
+}
+
+impl<T> BitOr<EBiVector2<T>> for EVector2<T>
+where
+    T: Num,
+{
+    type Output = EVector2<T>;
+
+    #[inline]
+    fn bitor(self, other: EBiVector2<T>) -> EVector2<T> {
+        EVector2 {
+            e1: -(self.e2 * other.e12),
+            e2: self.e1 * other.e12,
+        }
+    }
+}
+
+impl<T> BitOr<BiVector2<T>> for EVector2<T>
+where
+    T: Num,
+{
+    type Output = Vector2<T>;
+
+    #[inline]
+    fn bitor(self, other: BiVector2<T>) -> Vector2<T> {
+        Vector2 {
+            e0: self.e2 * other.e20 - self.e1 * other.e01,
+            e1: -(self.e2 * other.e12),
+            e2: self.e1 * other.e12,
+        }
+    }
+}
+
+impl<T> BitOr<Pseudo2<T>> for EVector2<T>
+where
+    T: Num,
+{
+    type Output = XBiVector2<T>;
+
+    #[inline]
+    fn bitor(self, other: Pseudo2<T>) -> XBiVector2<T> {
+        XBiVector2 {
+            e01: self.e2 * other.e012,
+            e20: self.e1 * other.e012,
+        }
+    }
+}
+
 impl<T> BitXor<Scalar2<T>> for EVector2<T>
 where
     T: Num,
@@ -1188,6 +1363,50 @@ where
     fn bitxor(self, other: EVector2<T>) -> EBiVector2<T> {
         EBiVector2 {
             e12: self.e1 * other.e2 - self.e2 * other.e1,
+        }
+    }
+}
+
+impl<T> BitXor<Vector2<T>> for EVector2<T>
+where
+    T: Num,
+{
+    type Output = BiVector2<T>;
+
+    #[inline]
+    fn bitxor(self, other: Vector2<T>) -> BiVector2<T> {
+        BiVector2 {
+            e01: -(self.e1 * other.e0),
+            e20: self.e2 * other.e0,
+            e12: self.e1 * other.e2 - self.e2 * other.e1,
+        }
+    }
+}
+
+impl<T> BitXor<XBiVector2<T>> for EVector2<T>
+where
+    T: Num,
+{
+    type Output = Pseudo2<T>;
+
+    #[inline]
+    fn bitxor(self, other: XBiVector2<T>) -> Pseudo2<T> {
+        Pseudo2 {
+            e012: self.e1 * other.e20 + self.e2 * other.e01,
+        }
+    }
+}
+
+impl<T> BitXor<BiVector2<T>> for EVector2<T>
+where
+    T: Num,
+{
+    type Output = Pseudo2<T>;
+
+    #[inline]
+    fn bitxor(self, other: BiVector2<T>) -> Pseudo2<T> {
+        Pseudo2 {
+            e012: self.e1 * other.e20 + self.e2 * other.e01,
         }
     }
 }
@@ -1239,6 +1458,66 @@ where
     #[inline]
     fn mul(self, other: EVector2<T>) -> (Scalar2<T>, EBiVector2<T>) {
         (self | other, self ^ other)
+    }
+}
+
+impl<T> Mul<Vector2<T>> for EVector2<T>
+where
+    T: Num,
+{
+    type Output = (Scalar2<T>, BiVector2<T>);
+
+    #[inline]
+    fn mul(self, other: Vector2<T>) -> (Scalar2<T>, BiVector2<T>) {
+        (self | other, self ^ other)
+    }
+}
+
+impl<T> Mul<XBiVector2<T>> for EVector2<T>
+where
+    T: Num,
+{
+    type Output = (XVector2<T>, Pseudo2<T>);
+
+    #[inline]
+    fn mul(self, other: XBiVector2<T>) -> (XVector2<T>, Pseudo2<T>) {
+        (self | other, self ^ other)
+    }
+}
+
+impl<T> Mul<EBiVector2<T>> for EVector2<T>
+where
+    T: Num,
+{
+    type Output = EVector2<T>;
+
+    #[inline]
+    fn mul(self, other: EBiVector2<T>) -> EVector2<T> {
+        self | other
+    }
+}
+
+impl<T> Mul<BiVector2<T>> for EVector2<T>
+where
+    T: Num,
+{
+    type Output = (Vector2<T>, Pseudo2<T>);
+
+    #[inline]
+    fn mul(self, other: BiVector2<T>) -> (Vector2<T>, Pseudo2<T>) {
+        (self | other, self ^ other)
+    }
+}
+
+impl<T> Mul<Pseudo2<T>> for EVector2<T>
+where
+    T: Num,
+{
+    type Output = XBiVector2<T>;
+
+    #[inline]
+    fn mul(self, other: Pseudo2<T>) -> XBiVector2<T> {
+        self | other
     }
 }
 
