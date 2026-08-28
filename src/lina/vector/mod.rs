@@ -1,7 +1,6 @@
-//! Contains vector and operations for them.
+//! Contains N-dimensional vector type and operations for it.
 //!
-//!
-//!
+//! Some methods are implemented for specific dimensions (1D, 2D, 3D, and 4D) to provide convenient access to the elements of the vector.
 //!
 
 use core::{

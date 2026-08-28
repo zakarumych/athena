@@ -8,11 +8,19 @@
 mod scalar;
 // mod simd;
 
-mod matrix;
-mod pga;
-mod vector;
+#[cfg(feature = "lina")]
+mod lina;
 
-pub use self::{matrix::*, pga::*, scalar::*, vector::*};
+#[cfg(any(feature = "pga2", feature = "pga3"))]
+mod pga;
+
+pub use self::scalar::*;
+
+#[cfg(feature = "lina")]
+pub use self::lina::*;
+
+#[cfg(any(feature = "pga2", feature = "pga3"))]
+pub use self::pga::*;
 
 #[cfg(feature = "serde")]
 mod array_init;

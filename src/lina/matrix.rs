@@ -1,4 +1,4 @@
-//! Matrices
+//! Contains NxM-dimensional matrix type and operations for it.
 //!
 
 use core::{

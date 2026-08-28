@@ -1,6 +1,6 @@
 use core::ops::{Add, BitOr, BitXor, Div, DivAssign, Mul, MulAssign, Neg, Not, Sub};
 
-use crate::Num;
+use crate::scalar::Num;
 
 use super::{scalar::Scalar3, BiVector3, Dual, EBiVector3, Pseudo3, Vector3, XBiVector3};
 

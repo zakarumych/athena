@@ -1,3 +1,8 @@
+//! This module provides utility functions for initializing arrays and slices in a safe manner, even when the initialization process may fail.
+//! It uses `MaybeUninit` to handle uninitialized memory safely and ensures that any partially initialized data is properly dropped in case of an error.
+//!
+//! This is expected to be superceded by core alternatives when they become stable.
+
 use core::mem::MaybeUninit;
 
 /// Initializes an array using a closure.

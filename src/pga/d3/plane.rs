@@ -1,6 +1,6 @@
-use crate::{Num, Point3};
+use crate::scalar::Num;
 
-use super::elements::Vector3;
+use super::{elements::Vector3, Point3};
 
 /// Plane is fundamental object in 3d projective geometric algebra.
 /// All other objects are produced by combining planes.

@@ -6,8 +6,11 @@ description = "Athena is math crate tailored for game engines, rendering and phy
 license = "MIT OR Apache-2.0"
 
 [features]
+lina = []
+pga2 = []
+pga3 = []
 std = []
-default = ["std"]
+default = ["std", "lina", "pga2", "pga3"]
 serde = ["dep:serde"]
 
 [dependencies]
