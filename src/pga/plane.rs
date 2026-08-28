@@ -1,4 +1,4 @@
-use crate::Num;
+use crate::{Num, Point3};
 
 use super::elements::Vector3;
 
@@ -58,6 +58,17 @@ where
         e3: T::ZERO,
     });
 
+    /// Returns true if this is a plane at infinity.
+    #[inline]
+    pub fn is_ideal(&self) -> bool {
+        self.0.e1 == T::ZERO && self.0.e2 == T::ZERO && self.0.e3 == T::ZERO
+    }
+
+    /// Returns the normal direction of the plane.
+    pub fn normal(&self) -> Point3<T> {
+        Point3::ideal(self.0.e1, self.0.e2, self.0.e3)
+    }
+
     /// Creates a new plane from projective vector elements.
     #[inline]
     pub const fn new(e0: T, e1: T, e2: T, e3: T) -> Self {
@@ -76,13 +87,13 @@ where
         Plane3::new(d, a, b, c)
     }
 
-    /// Normalizes the line.
+    /// Normalizes the plane.
     #[inline]
     pub fn normalize(&mut self) {
         self.0.normalize();
     }
 
-    /// Returns a normalized line.
+    /// Returns a normalized plane.
     #[inline]
     pub fn normalized(&self) -> Self {
         Plane3(self.0.normalized())

@@ -8,9 +8,6 @@ mod line;
 mod motor;
 mod plane;
 mod point;
-mod reflector;
-mod rotor;
-mod screw;
 
 pub use self::{
     line::{Line2, Line3},

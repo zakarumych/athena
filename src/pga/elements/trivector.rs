@@ -59,7 +59,21 @@ where
             self.e021 /= norm;
             self.e013 /= norm;
             self.e032 /= norm;
-            self.e123 /= norm;
+            self.e123 = T::ONE;
+        } else {
+            let s = norm.sign();
+            let m = (self.e021 * self.e021
+                + self.e013 * self.e013
+                + self.e032 * self.e032
+                + self.e123 * self.e123)
+                .sqrt()
+                .recip()
+                * s;
+
+            self.e021 *= m;
+            self.e013 *= m;
+            self.e032 *= m;
+            self.e123 = T::ZERO;
         }
     }
 

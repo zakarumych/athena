@@ -36,6 +36,9 @@ pub trait Num:
     /// Constant value of half - 0.5.
     const HALF: Self;
 
+    /// Returns the sign of the scalar.
+    fn sign(self) -> Self;
+
     /// Returns the reciprocal of the scalar.
     #[inline]
     fn recip(self) -> Self {
@@ -83,6 +86,11 @@ impl Num for f32 {
     const ONE: Self = 1.0;
     const TWO: Self = 2.0;
     const HALF: Self = 0.5;
+
+    #[inline]
+    fn sign(self) -> Self {
+        self.signum()
+    }
 
     #[inline]
     fn recip(self) -> Self {
@@ -147,6 +155,11 @@ impl Num for f64 {
     const ONE: Self = 1.0;
     const TWO: Self = 2.0;
     const HALF: Self = 0.5;
+
+    #[inline]
+    fn sign(self) -> Self {
+        self.signum()
+    }
 
     #[inline]
     fn recip(self) -> Self {

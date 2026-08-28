@@ -213,7 +213,7 @@ where
             let log = self.bivector;
 
             let scalar = Scalar2(T::ONE);
-            let distance_halved = log.signed_norm() * rhs;
+            let distance_halved = (log.e01 * log.e01 + log.e20 * log.e20).sqrt() * rhs;
 
             let bivector = log.normalized() * distance_halved;
 
@@ -438,16 +438,21 @@ where
     /// Halves the motor.
     #[inline]
     pub fn sqrt(&self) -> Self {
-        let a = Motor3 {
-            scalar: (self.scalar + T::ONE),
+        let one_plus_m = Motor3 {
+            scalar: Scalar3(self.scalar.0 + T::ONE),
             bivector: self.bivector,
             pseudo: self.pseudo,
         };
 
-        let mut b = a.normalized();
+        let s1 = self.scalar.0 + T::ONE;
 
-        b.pseudo = self.pseudo * T::HALF;
-        a * b.normalized()
+        let correction = Motor3 {
+            scalar: Scalar3(T::ONE),
+            bivector: BiVector3::ZERO,
+            pseudo: (self.pseudo / s1) * -T::HALF,
+        };
+
+        one_plus_m * correction
     }
 }
 
@@ -486,11 +491,12 @@ where
 
     #[inline]
     fn mul(self, rhs: T) -> Motor3<T> {
-        if self.bivector == BiVector3::ZERO {
+        if self.bivector.norm2() == T::ZERO {
             let log = self.bivector;
 
             let scalar = Scalar3(T::ONE);
-            let distance_halved = log.norm() * rhs;
+            let distance_halved =
+                (log.e01 * log.e01 + log.e02 * log.e02 + log.e03 * log.e03).sqrt() * rhs;
 
             let bivector = log.normalized() * distance_halved;
 

@@ -54,7 +54,17 @@ where
         if norm != T::ZERO {
             self.e01 /= norm;
             self.e20 /= norm;
-            self.e12 /= norm;
+            self.e12 = T::ONE;
+        } else {
+            let s = norm.sign();
+            let m = (self.e01 * self.e01 + self.e20 * self.e20 + self.e12 * self.e12)
+                .sqrt()
+                .recip()
+                * s;
+
+            self.e01 *= m;
+            self.e20 *= m;
+            self.e12 = T::ZERO;
         }
     }
 
@@ -1452,6 +1462,14 @@ where
             self.e12 /= norm;
             self.e31 /= norm;
             self.e23 /= norm;
+        } else {
+            let ideal2 = self.e01 * self.e01 + self.e02 * self.e02 + self.e03 * self.e03;
+            if ideal2 != T::ZERO {
+                let m = ideal2.sqrt().recip();
+                self.e01 *= m;
+                self.e02 *= m;
+                self.e03 *= m;
+            }
         }
     }
 
